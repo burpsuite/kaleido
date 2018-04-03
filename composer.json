@@ -1,6 +1,6 @@
 {
     "name": "burpsuite/kaleido",
-    "description": "Kaleido http request traffic forwarding tool.",
+    "description": "Kaleido traffic forwarding tool.",
     "type": "library",
     "license": "proprietary",
     "keywords": ["kaleido"],
