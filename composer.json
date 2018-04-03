@@ -1,4 +1,5 @@
 {
+    
     "name": "burpsuite/kaleido",
     "description": "Kaleido traffic forwarding tool.",
     "type": "library",
