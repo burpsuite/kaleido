@@ -76,6 +76,27 @@ class Loader {
 		$this->setConsole();
 	}
 
+    /**
+     * @param $task_id
+     * @param $full_url
+     * @param $raw_param
+     * @return mixed|string
+     * @throws \ErrorException
+     * @throws \LeanCloud\CloudException
+     */
+    public function listenHttp($task_id, $full_url, $raw_param) {
+        new Encoder($task_id, $full_url, $raw_param);
+        new Sender(Encoder::payload(false));
+        new Decoder(Sender::response(false));
+        new Recorder(Encoder::payload(false), Sender::response(false));
+        return Decoder::getBody();
+    }
+
+    public function replayHttp($action, $object_id) {
+        new Replay($action, $object_id);
+        return Replay::getBody();
+    }
+
 	private function checkType() {
 		switch ($this->file_type) {
 			case 'local':
