@@ -28,6 +28,14 @@ class Loader {
 		$this->handle();
 	}
 
+    /**
+     * @throws \ErrorException
+     */
+	public function updateDB() {
+	    $this->setEnv();
+	    $this->handle();
+    }
+
 	public static function fetch() {
         return \is_string(self::$redis['fetch'])
             ? self::$redis['fetch'] : 'error_fetch';

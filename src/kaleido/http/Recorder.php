@@ -8,6 +8,7 @@ use LeanCloud\Object;
 class Recorder
 {
     const exist_keys = ['app_id', 'app_key', 'master_key', 'server_url', 'record_class'];
+    public $env_name = 'kaleido_record';
     public $app_id;
     public $app_key;
     public $master_key;
@@ -45,9 +46,10 @@ class Recorder
     }
 
     private function setEnv() {
-        if (Utility::bjsonDecode(getenv('KALEIDO_RECORD'))) {
-            $conf = Utility::bjsonDecode(getenv('KALEIDO_RECORD'), true);
-            foreach ((array)$conf as $key => $value) {
+        if (getenv(strtoupper($this->env_name))) {
+            $env = getenv(strtoupper($this->env_name));
+            $env_info = Utility::bjsonDecode($env, true);
+            foreach ((array)$env_info as $key => $value) {
                 $this->$key = $value;
             }
         }

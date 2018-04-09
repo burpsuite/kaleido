@@ -190,8 +190,8 @@ class Sender
         }
     }
 
-    private function setHeaders($response_headers) {
-        foreach ((object)$response_headers as $key => $value) {
+    private function setHeaders(Curl $response_headers) {
+        foreach ($response_headers as $key => $value) {
             if ($key !== 'Set-Cookie') {
                 self::$response['headers'][$key] = $value;
             }
