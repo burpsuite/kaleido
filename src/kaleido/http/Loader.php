@@ -31,7 +31,7 @@ class Loader {
     /**
      * @throws \ErrorException
      */
-	public function updateDB() {
+	public function flushDB() {
 	    $this->setEnv();
 	    $this->handle();
     }
@@ -100,6 +100,12 @@ class Loader {
         return Decoder::getBody();
     }
 
+    /**
+     * @param $action
+     * @param $object_id
+     * @return mixed
+     * @throws \ErrorException
+     */
     public function replayHttp($action, $object_id) {
         new Replay($action, $object_id);
         return Replay::getBody();
