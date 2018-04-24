@@ -3,6 +3,7 @@
 namespace Kaleido\Http;
 
 use Curl\Curl;
+use Curl\CaseInsensitiveArray;
 
 class Sender
 {
@@ -190,7 +191,7 @@ class Sender
         }
     }
 
-    private function setHeaders(Curl $response_headers) {
+    private function setHeaders(CaseInsensitiveArray $response_headers) {
         foreach ($response_headers as $key => $value) {
             if ($key !== 'Set-Cookie') {
                 self::$response['headers'][$key] = $value;
