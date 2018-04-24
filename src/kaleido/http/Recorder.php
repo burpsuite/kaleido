@@ -3,7 +3,7 @@
 namespace Kaleido\Http;
 
 use LeanCloud\Client;
-use LeanCloud\Object;
+use LeanCloud\Object as _Object;
 
 class Recorder
 {
@@ -37,7 +37,7 @@ class Recorder
         if (\is_string($this->app_id)) {
             Client::initialize($this->app_id, $this->app_key, $this->master_key);
             Client::setServerUrl($this->server_url);
-            $object = new Object($this->record_class);
+            $object = new _Object($this->record_class);
             $object->set('request', $request);
             $object->set('response', $response);
             $object->save();
@@ -55,7 +55,7 @@ class Recorder
         }
     }
 
-    private function setObjectId($response, Object $object_class) {
+    private function setObjectId($response, _Object $object_class) {
         if (\is_array($response) && \is_string($object_class->get('objectId'))) {
             $response['action']['response_header']
                 ? header('Kaleido-RecId: '.$object_class->get('objectId'))
