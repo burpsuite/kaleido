@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9b95cd6bb371ef0f734cac2a84d3a3d5",
+    "content-hash": "787a938e50024563a1200dcd982e03be",
     "packages": [
         {
             "name": "leancloud/leancloud-sdk",
