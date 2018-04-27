@@ -16,17 +16,15 @@ class Encoder
      * Encoder constructor.
      * @param $task_id
      * @param $full_url
-     * @param $raw_param
      * @throws \ErrorException
      */
-    public function __construct($task_id, $full_url, $raw_param) {
+    public function __construct($task_id, $full_url) {
         $this->_load();
         $this->matchTaskId($task_id);
         $this->check($full_url);
         $this->handle(
             $task_id,
-            $full_url, 
-            $raw_param
+            $full_url
         );
     }
 
@@ -43,11 +41,11 @@ class Encoder
         $this->checkMethod();
     }
 
-    private function handle($task_id, $full_url, $raw_param) {
+    private function handle($task_id, $full_url) {
         $this->setTaskId($task_id);
         $this->setMethod();
         $this->setUrl($full_url);
-        $this->setUrlParam($raw_param);
+        $this->setUrlParam();
         $this->setUrl($full_url);
         $this->setCookie();
         $this->setHeader();
@@ -151,10 +149,10 @@ class Encoder
         $this->setPayload('method', $method);
     }
 
-    private function setUrlParam($raw_param) {
+    private function setUrlParam() {
         switch ($this->method) {
             case 'get' && $this->action['fix_same_param']:
-                $this->setPayload('url', self::$payload['url'].$raw_param);
+                $this->setPayload('url', self::$payload['url'].$_SERVER['QUERY_STRING']);
                 break;
             case 'get':
                 $this->setPayload('params', $_GET);
