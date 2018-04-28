@@ -87,13 +87,12 @@ class Loader {
     /**
      * @param $task_id
      * @param $full_url
-     * @param $raw_param
      * @return mixed|string
      * @throws \ErrorException
      * @throws \LeanCloud\CloudException
      */
-    public function listenHttp($task_id, $full_url, $raw_param) {
-        new Encoder($task_id, $full_url, $raw_param);
+    public function listenHttp($task_id, $full_url) {
+        new Encoder($task_id, $full_url);
         new Sender(Encoder::payload(false));
         new Decoder(Sender::response(false));
         new Recorder(Encoder::payload(false), Sender::response(false));
