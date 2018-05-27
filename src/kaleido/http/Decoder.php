@@ -2,10 +2,9 @@
 
 namespace Kaleido\Http;
 
-class Decoder
+class Decoder extends Kernel
 {
     public static $payload = [];
-    public $route_info = [];
     public $task_id;
     public $error = false;
     public $error_code = 0;
@@ -27,14 +26,6 @@ class Decoder
         $this->setResponse($response);
         $this->matchTaskId();
         $this->handle();
-    }
-
-    /**
-     * @throws \ErrorException
-     */
-    private function _load() {
-        (new Loader())->loadfile();
-        return $this->route_info = json_decode(Loader::fetch(), true);
     }
 
     private function matchTaskId() {

@@ -2,10 +2,9 @@
 
 namespace Kaleido\Http;
 
-class Encoder
+class Encoder extends Kernel
 {
     public $allow_list = ['post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
-    public $route_info = [];
     public $method;
     public $action = [];
     public $host;
@@ -22,18 +21,7 @@ class Encoder
         $this->_load();
         $this->matchTaskId($task_id);
         $this->check($full_url);
-        $this->handle(
-            $task_id,
-            $full_url
-        );
-    }
-
-    /**
-     * @throws \ErrorException
-     */
-    private function _load() {
-        (new Loader())->loadfile();
-        return $this->route_info = json_decode(Loader::fetch(), true);
+        $this->handle($task_id, $full_url);
     }
 
     private function check($full_url) {
