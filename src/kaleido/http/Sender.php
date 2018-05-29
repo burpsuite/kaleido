@@ -33,9 +33,10 @@ class Sender
     public function setTiming() {
         null === $this->getResponse('timing')
             ? $this->setResponse('timing', Utility::millitime())
-                : $this->setResponse('timing',
-                    Utility::millitime() - 
-                    $this->getResponse('timing').'ms'
+             : $this->setResponse(
+                'timing',
+                Utility::millitime() - 
+                $this->getResponse('timing').'ms'
             );
     }
 

@@ -2,10 +2,8 @@
 
 namespace Kaleido\Http;
 
-class Decoder extends Kernel
+class Decoder extends Worker
 {
-    public static $payload = [];
-    public $task_id;
     public $error = false;
     public $error_code = 0;
     public $action = [];
@@ -28,14 +26,6 @@ class Decoder extends Kernel
         $this->handle();
     }
 
-    private function matchTaskId() {
-        if (array_key_exists($this->task_id, $this->route_info)) {
-            foreach ((array)$this->route_info[$this->task_id] as $key => $value) {
-                $this->$key = $value;
-            }
-        }
-    }
-
     private function setResponse($response) {
         if (\is_array($response)) {
             foreach ($response as $key => $value) {
@@ -45,12 +35,9 @@ class Decoder extends Kernel
     }
 
     private function handle() {
-        $this->setError();
-        $this->setHeaders();
-        $this->setTiming();
-        $this->setUniqId();
-        $this->setCookies();
-        $this->setBody();
+        $this->checkError();
+        $this->setHeaders()->setTiming()
+        ->setUniqueId()->setCookies()->setBody();
     }
 
     public static function getBody() {
@@ -62,22 +49,7 @@ class Decoder extends Kernel
         return self::$payload[$name] ?? null;
     }
 
-    private function setPayload($name, $value) {
-        \is_string($name) ?: $name = 'null';
-        switch ($name) {
-            case \is_array($value) && !\count($value):
-                self::$payload[$name] = null;
-                break;
-            case null === $value:
-                unset(self::$payload[$name]);
-                break;
-            default:
-                self::$payload[$name] = $value;
-                break;
-        }
-    }
-
-    private function setError() {
+    private function checkError() {
         if ($this->error && \is_int($this->error_code)) {
             new HttpException(
                 'target server status is abnormal.',
@@ -86,10 +58,11 @@ class Decoder extends Kernel
         }
     }
 
-    private function setUniqId() {
+    private function setUniqueId() {
         if ($this->action['response_header']) {
-            header('Kaleido-UniqId:'.uniqid('kd_', true));
+            header('X-UniqueId:'.uniqid('', true));
         }
+        return $this;
     }
 
     private function setBody() {
@@ -104,7 +77,9 @@ class Decoder extends Kernel
                 $this->patchBody();
                 $this->setPayload(
                     'body',
-                    gzencode($this->getPayload('body'))
+                    gzencode(
+                        $this->getPayload('body')
+                    )
                 );
                 break;
             case 'text':
@@ -117,6 +92,7 @@ class Decoder extends Kernel
                 break;
             default:
         }
+        return $this;
     }
 
     private function patchBody() {
@@ -124,16 +100,12 @@ class Decoder extends Kernel
             \is_array($this->response_handle['body_patch'])
                 ? $patch = $this->response_handle['body_patch']
                     : $patch = [];
-            $body = json_decode(
-                $this->getPayload('body'),
-                true
-            );
+            $body = json_decode($this->getPayload('body'), true);
             $this->setPayload(
                 'body',
-                json_encode(array_replace_recursive(
-                        $body,
-                        $patch
-                ))
+                json_encode(
+                    array_replace_recursive($body, $patch)
+                )
             );
         }
     }
@@ -146,6 +118,7 @@ class Decoder extends Kernel
                 header("{$key}: {$value}");
             }
         }
+        return $this;
     }
 
     private function setCookies() {
@@ -156,32 +129,13 @@ class Decoder extends Kernel
                 setcookie($key, $value);
             }
         }
+        return $this;
     }
 
     private function setTiming() {
         if (\is_string($this->timing) && $this->action['response_header']) {
-            header("Kaleido-Timing: {$this->timing}");
+            header("X-Timing: {$this->timing}");
         }
-    }
-
-    private function setSort(array $rep_list, $subject, $save_name = 'null') {
-        if (!\count($rep_list)) {
-            $this->setPayload($save_name, $subject);
-        }
-        foreach ($rep_list as $key => $value) {
-            switch ($rep_list) {
-                case \is_array($subject):
-                    self::$payload[$save_name][$key] = $value;
-                    if (!$value) {
-                        unset(self::$payload[$save_name][$key]);
-                    }
-                    break;
-                case \is_string($subject) && \is_string($value):
-                    $filter_res = preg_replace("/{$key}/", $value, $subject);
-                    $this->setPayload($save_name, $filter_res);
-                    break;
-                default:
-            }
-        }
+        return $this;
     }
 }

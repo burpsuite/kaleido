@@ -2,39 +2,38 @@
 
 namespace Kaleido\Http;
 
-class Encoder extends Kernel
+class Encoder extends Worker
 {
     public $allow_list = ['post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
     public $method;
     public $action = [];
     public $host;
     public $request_handle = [];
-    public static $payload = [];
 
     /**
      * Encoder constructor.
      * @param $task_id
-     * @param $full_url
+     * @param $url
      * @throws \ErrorException
      */
-    public function __construct($task_id, $full_url) {
+    public function __construct($task_id, $url) {
         $this->_load();
         $this->matchTaskId($task_id);
-        $this->check($full_url);
-        $this->handle($task_id, $full_url);
+        $this->check($url);
+        $this->handle($task_id, $url);
     }
 
-    private function check($full_url) {
-        $this->checkHost($full_url);
+    private function check($url) {
+        $this->checkHost($url);
         $this->checkMethod();
     }
 
-    private function handle($task_id, $full_url) {
+    private function handle($task_id, $url) {
         $this->setTaskId($task_id);
         $this->setMethod();
-        $this->setUrl($full_url);
+        $this->setUrl($url);
         $this->setUrlParam();
-        $this->setUrl($full_url);
+        $this->setUrl($url);
         $this->setCookie();
         $this->setHeader();
         $this->setAction();
@@ -45,19 +44,11 @@ class Encoder extends Kernel
             : self::$payload;
     }
 
-    private function matchTaskId($task_id) {
-        if (array_key_exists($task_id, $this->route_info)) {
-            foreach ((array)$this->route_info[$task_id] as $key => $value) {
-                $this->$key = $value;
-            }
-        }
-    }
-
-    private function checkHost($full_url) {
+    private function checkHost($url) {
         if ($this->action['check_hostname']) {
             switch ($this->host) {
                 case \is_array($this->host):
-                    $host = preg_replace('/^((http|https)\:\/\/.*?\..*?)\/.*/', '$1', $full_url);
+                    $host = preg_replace('/^((http|https)\:\/\/.*?\..*?)\/.*/', '$1', $url);
                     if (!\in_array($host, $this->host, true)) {
                         new HttpException(
                             'the request_host and kaleido configuration do not match.',
@@ -66,7 +57,7 @@ class Encoder extends Kernel
                     }
                     break;
                 case \is_string($this->host):
-                    if (!preg_match("/{$this->host}/", $full_url)) {
+                    if (!preg_match("/{$this->host}/", $url)) {
                         new HttpException(
                             'the request_host and kaleido configuration do not match.',
                             -400
@@ -102,21 +93,6 @@ class Encoder extends Kernel
 
     private function getPayload($name = 'null') {
         return self::$payload[$name] ?? null;
-    }
-
-    private function setPayload($name, $value) {
-        \is_string($name) ?: $name = 'null';
-        switch ($name) {
-            case \is_array($value) && !\count($value):
-                self::$payload[$name] = null;
-                break;
-            case null === $value:
-                unset(self::$payload[$name]);
-                break;
-            default:
-                self::$payload[$name] = $value;
-                break;
-        }
     }
 
     private function setTaskId($task_id) {
@@ -237,32 +213,6 @@ class Encoder extends Kernel
                 $_COOKIE, 
                 'cookies'
             );
-        }
-    }
-
-    /**
-     * @param array $rep_list
-     * @param $subject
-     * @param string $save_name
-     */
-    private function setSort(array $rep_list, $subject, $save_name = 'null') {
-        if (!\count($rep_list)) {
-            $this->setPayload($save_name, $subject);
-        }
-        foreach ($rep_list as $key => $value) {
-            switch ($rep_list) {
-                case \is_array($subject):
-                    self::$payload[$save_name][$key] = $value;
-                    if (!$value) {
-                        unset(self::$payload[$save_name][$key]);
-                    }
-                    break;
-                case \is_string($subject):
-                    $filter_res = preg_replace("/{$key}/", $value, $subject);
-                    $this->setPayload($save_name, $filter_res);
-                    break;
-                default:
-            }
         }
     }
 }
