@@ -19,9 +19,9 @@ class Loader extends Worker
 		'fetch'  => null
 	];
 
-    /**
-     * @throws \ErrorException
-     */
+	/**
+	 * @throws \ErrorException
+	 */
 	public function loadfile() {
 		$this->getEnv('dbinfo');
 		$this->check();
@@ -29,22 +29,22 @@ class Loader extends Worker
 		$this->lockClass();
 	}
 
-    private function lockClass() {
-        self::$lock = self::$class;
-        self::$class = [];
-    }
+	private function lockClass() {
+		self::$lock = self::$class;
+		self::$class = [];
+	}
 
-    /**
-     * @throws \ErrorException
-     */
+	/**
+	 * @throws \ErrorException
+	 */
 	public function flushDB() {
-	    $this->getEnv('dbinfo');
-	    $this->handle();
-    }
+		$this->getEnv('dbinfo');
+		$this->handle();
+	}
 
 	public static function fetch() {
-        return \is_string(self::$lock['fetch'])
-            ? self::$lock['fetch'] : 'error_fetch';
+		return \is_string(self::$lock['fetch'])
+			? self::$lock['fetch'] : 'error_fetch';
 	}
 
 	private function check() {
@@ -52,43 +52,43 @@ class Loader extends Worker
 		$this->checkRedis();
 	}
 
-    /**
-     * @throws \ErrorException
-     */
+	/**
+	 * @throws \ErrorException
+	 */
 	private function handle() {
 		$this->fetchData();
 		$this->updateRedis();
 		$this->setConsole();
 	}
 
-    /**
-     * @param $task_id
-     * @param $full_url
-     * @return mixed|string
-     * @throws \ErrorException
-     * @throws \LeanCloud\CloudException
-     */
-    public function listenHttp($task_id, $url) {
-        new Encoder($task_id, $url);
-        new Sender(Encoder::class(false));
-        new Decoder(Sender::response(false));
-        new Recorder(
-        	Encoder::class(false), 
-        	Sender::response(false)
-        );
-        return Decoder::getBody();
-    }
+	/**
+	 * @param $task_id
+	 * @param $full_url
+	 * @return mixed|string
+	 * @throws \ErrorException
+	 * @throws \LeanCloud\CloudException
+	 */
+	public function listenHttp($task_id, $url) {
+		new Encoder($task_id, $url);
+		new Sender(Encoder::class(false));
+		new Decoder(Sender::response(false));
+		new Recorder(
+			Encoder::class(false), 
+			Sender::response(false)
+		);
+		return Decoder::getBody();
+	}
 
-    /**
-     * @param $action
-     * @param $object_id
-     * @return mixed
-     * @throws \ErrorException
-     */
-    public function replayHttp($action, $object_id) {
-        new Replay($action, $object_id);
-        return Replay::getBody();
-    }
+	/**
+	 * @param $action
+	 * @param $object_id
+	 * @return mixed
+	 * @throws \ErrorException
+	 */
+	public function replayHttp($action, $object_id) {
+		new Replay($action, $object_id);
+		return Replay::getBody();
+	}
 
 	private function checkType() {
 		switch ($this->file_type) {
@@ -124,9 +124,9 @@ class Loader extends Worker
 		}
 	}
 
-    /**
-     * @throws \ErrorException
-     */
+	/**
+	 * @throws \ErrorException
+	 */
 	private function fetchData() {
 		if (!$this->getClass('expire')) {
 			switch ($this->file_type) {
@@ -158,10 +158,10 @@ class Loader extends Worker
 				$this->setClass('fetch', json_encode($response));
 				$this->isJson($this->getClass('fetch'));
 				break;
-            case \is_string($response):
-                $this->setClass('fetch', $response);
-                $this->isJson($this->getClass('fetch'));
-                break;
+			case \is_string($response):
+				$this->setClass('fetch', $response);
+				$this->isJson($this->getClass('fetch'));
+				break;
 		}
 	}
 
@@ -177,7 +177,7 @@ class Loader extends Worker
 		if ($this->getClass('exist')) {
 			$expire = json_decode($redis_obj->get(sha1($this->file_path.'expire')), true);
 			if ($expire['expire_time'] - time() > 0) {
-			    $this->setClass('expire', $expire['expire_time'] - time());
+				$this->setClass('expire', $expire['expire_time'] - time());
 			}
 		}
 	}
