@@ -5,17 +5,17 @@ namespace Kaleido\Http;
 use Curl\Curl;
 use Curl\CaseInsensitiveArray;
 
-class Sender
+class Sender extends Worker
 {
     public $allow_list = ['get', 'post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
-    public $headers = [];
-    public $cookies = [];
-    public $method;
     public $url;
+    private static $lock;
+    public $method;
+    public $task_id;
     public $params = [];
     public $action = [];
-    public $task_id;
-    public static $response = [];
+    public $headers = [];
+    public $cookies = [];
 
     /**
      * Sender constructor.
@@ -23,28 +23,16 @@ class Sender
      * @throws \ErrorException
      */
     public function __construct(array $payload) {
-        $this->setTiming();
         $this->decode($payload);
         $this->check();
         $this->handle();
-        $this->setTiming();
-    }
-
-    public function setTiming() {
-        null === $this->getResponse('timing')
-            ? $this->setResponse('timing', Utility::millitime())
-             : $this->setResponse(
-                'timing',
-                Utility::millitime() - 
-                $this->getResponse('timing').'ms'
-            );
+        $this->lockClass();
     }
 
     public function decode($payload) {
-        Utility::isArray(
-            $payload,
-            'the payload is a non-array type.',
-            -500
+        \is_array($payload) 
+        ?: new HttpException(
+            self::error_message['non_array'], -500
         );
         foreach ((array)$payload as $key => $value) {
             $this->$key = $value;
@@ -52,11 +40,9 @@ class Sender
     }
 
     public function check() {
-        $this->checkUrl();
-        $this->checkMethod();
-        $this->checkParams();
-        $this->checkCookies();
-        $this->checkHeaders();
+        $this->checkUrl()->checkMethod()
+        ->checkParams()->checkCookies()
+        ->checkHeaders();
     }
 
     /**
@@ -68,8 +54,7 @@ class Sender
         $curl->setCookies($this->cookies);
         $curl->{$this->method}($this->url, $this->params);
         $this->setError($curl->error, $curl->errorCode);
-        $this->setAction();
-        $this->setTaskId();
+        $this->setAction()->setTaskId();
         if (!$curl->error) {
             $this->setBody($curl);
             $this->setHeaders($curl->responseHeaders);
@@ -77,117 +62,94 @@ class Sender
         }
     }
 
+    private function lockClass() {
+        self::$lock = self::$class;
+        self::$class = [];
+    }
+
     public static function response($encode) {
-        return $encode ? json_encode(self::$response)
-            : self::$response;
+        return $encode ? json_encode(self::$lock)
+            : self::$lock;
     }
 
     public function setAction() {
-        if (\is_array($this->action) && !$this->getResponse('error')) {
-            $this->setResponse('action', $this->action);
-        }
+        \is_array($this->action) && !$this->getClass('error')
+            ? $this->setClass('action', $this->action) : false;
+            return $this;
     }
 
     private function setTaskId() {
-        if (\is_string($this->task_id)) {
-            $this->setResponse('task_id', $this->task_id);
-        }
+        !\is_string($this->task_id) ?: 
+            $this->setClass('task_id', $this->task_id);
+            return $this;
     }
 
     private function setError($error, $error_code) {
         if ($error && \is_int($error_code)) {
-            $this->setResponse('error', 1);
-            $this->setResponse('error_code', $error_code);
+            $this->setClass('error', 1);
+            $this->setClass('error_code', $error_code);
         }
     }
 
     private function checkUrl() {
-        Utility::isString(
-            $this->url,
-            'the payload_url is a non-string type.',
-            -500
+        \is_string($this->url) 
+        ?: new HttpException(
+            self::error_message['non_string'], -500
         );
-        if (!preg_match('/(http|https)\:\/\//', $this->url)) {
+        if (!preg_match('/https?\:\/\//', $this->url)) {
             new HttpException(
-                'the payload_host is a invalid protocol.',
-                -400
+                self::error_message['payload_host'], -400
             );
         }
+        return $this;
     }
 
     private function checkMethod() {
-        Utility::isString(
-            $this->method,
-            'the payload_method is a non-string type.',
-            -500
+        \is_string($this->method) 
+        ?: new HttpException(
+            self::error_message['payload_method'], -500
         );
         if (!\in_array($this->method, $this->allow_list, true)) {
             new HttpException(
-                'the payload_method is an unsupported type.',
-                -400
+                self::error_message['unsupported_type'], -400
             );
         }
-    }
-
-    private function checkHeaders() {
-        if (null === $this->headers) {
-            $this->headers = [];
-        }
-    }
-
-    private function checkCookies() {
-        if (null === $this->cookies) {
-            $this->cookies = [];
-        }
+        return $this;
     }
 
     private function checkParams() {
-        if (null === $this->params) {
-            $this->params = [];
-        }
+        $this->params
+            ?: $this->params = [];
+            return $this;
     }
 
-    private function setResponse($name, $value) {
-        \is_string($name) ?: $name = 'null';
-        switch ($name) {
-            case \is_array($value) && !\count($value):
-                self::$response[$name] = null;
-                break;
-            case null === $value:
-                unset(self::$response[$name]);
-                break;
-            default:
-                self::$response[$name] = $value;
-                break;
-        }
+    private function checkCookies() {
+        $this->cookies
+            ?: $this->cookies = [];
+            return $this;
     }
 
-    private function getResponse($name = 'null') {
-        return self::$response[$name] ?? null;
+    private function checkHeaders() {
+        $this->headers 
+            ?: $this->headers = [];
+            return $this;
     }
 
     private function setBody(Curl $response) {
         switch ($response) {
             case \is_object($response->response):
-                $this->setResponse('res_type', 'text');
-                $this->setResponse(
-                    'body', 
-                    json_encode($response->response)
-                );
+                $body = json_encode($response->response);
+                $this->setClass('res_type', 'text');
+                $this->setClass('body', $body);
                 break;
             case $response->responseHeaders['Content-Encoding'] === 'gzip':
-                $this->setResponse('res_type', 'gzip');
-                $this->setResponse(
-                    'body',
-                    base64_encode($response->response)
-                );
+                $body = base64_encode($response->response);
+                $this->setClass('res_type', 'gzip');
+                $this->setClass('body', $body);
                 break;
             default:
-                $this->setResponse('res_type', 'text');
-                $this->setResponse(
-                    'body', 
-                    $response->response
-                );
+                $this->setClass('res_type', 'text');
+                $this->setClass('body', $response->response);
                 break;
         }
     }
@@ -195,7 +157,7 @@ class Sender
     private function setHeaders(CaseInsensitiveArray $response_headers) {
         foreach ($response_headers as $key => $value) {
             if ($key !== 'Set-Cookie') {
-                self::$response['headers'][$key] = $value;
+                self::$class['headers'][$key] = $value;
             }
         }
     }
@@ -203,7 +165,7 @@ class Sender
     private function setCookies($response_cookies) {
         switch ($response_cookies) {
             case \is_array($response_cookies):
-                $this->setResponse('cookies', $response_cookies);
+                $this->setClass('cookies', $response_cookies);
                 break;
         }
     }

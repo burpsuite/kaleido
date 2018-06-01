@@ -9,6 +9,7 @@ class Encoder extends Worker
     public $action = [];
     public $host;
     public $request_handle = [];
+    private static $lock = [];
 
     /**
      * Encoder constructor.
@@ -17,202 +18,189 @@ class Encoder extends Worker
      * @throws \ErrorException
      */
     public function __construct($task_id, $url) {
+        $this->setTiming();
         $this->_load();
         $this->matchTaskId($task_id);
         $this->check($url);
         $this->handle($task_id, $url);
+        $this->lockClass();
     }
 
     private function check($url) {
-        $this->checkHost($url);
-        $this->checkMethod();
+        $this->checkHost($url)->checkMethod();
     }
 
     private function handle($task_id, $url) {
-        $this->setTaskId($task_id);
-        $this->setMethod();
-        $this->setUrl($url);
-        $this->setUrlParam();
-        $this->setUrl($url);
-        $this->setCookie();
-        $this->setHeader();
-        $this->setAction();
+        $this->setTaskId($task_id)->setMethod()
+        ->setUrl($url)->setUrlParam()->setUrl($url)
+        ->setCookie()->setHeader()->setAction();
     }
 
-    public static function payload($encode) {
-        return $encode ? json_encode(self::$payload)
-            : self::$payload;
+    private function lockClass() {
+        self::$lock = self::$class;
+        self::$class = [];
+    }
+
+    public static function class($encode) {
+        return $encode ? json_encode(self::$lock)
+            : self::$lock;
     }
 
     private function checkHost($url) {
         if ($this->action['check_hostname']) {
             switch ($this->host) {
                 case \is_array($this->host):
-                    $host = preg_replace('/^((http|https)\:\/\/.*?\..*?)\/.*/', '$1', $url);
+                    $host = preg_replace('/^(https?\:\/\/.*?\..*?)\//', '$1', $url);
                     if (!\in_array($host, $this->host, true)) {
                         new HttpException(
-                            'the request_host and kaleido configuration do not match.',
-                            -400
+                            self::error_message['request_host'], -400
                         );
                     }
                     break;
                 case \is_string($this->host):
                     if (!preg_match("/{$this->host}/", $url)) {
                         new HttpException(
-                            'the request_host and kaleido configuration do not match.',
-                            -400
+                            self::error_message['request_host'], -400
                         );
                     }
                     break;
                 default:
             }
         }
+        return $this;
     }
 
     private function checkMethod() {
         switch ($this->method) {
             case \is_string($this->method):
-                if (strtolower($_SERVER['REQUEST_METHOD']) !== $this->method) {
+                $method = strtolower($_SERVER['REQUEST_METHOD']);
+                if ($method !== $this->method) {
                     new HttpException(
-                        'the request_method and kaleido do not match.',
-                        -400
+                        self::error_message['request_method'], -400
                     );
                 }
                 break;
             case \is_array($this->method):
-                if (!\in_array(strtolower($_SERVER['REQUEST_METHOD']), $this->method, true)) {
+                $method = strtolower($_SERVER['REQUEST_METHOD']);
+                if (!\in_array($method, $this->method, true)) {
                     new HttpException(
-                        'the request_method and kaleido do not match.',
-                        -400
+                        self::error_message['request_method'], -400
                     );
                 }
                 break;
             default:
         }
-    }
-
-    private function getPayload($name = 'null') {
-        return self::$payload[$name] ?? null;
+        return $this;
     }
 
     private function setTaskId($task_id) {
-        if (\is_string($task_id)) {
-            $this->setPayload('task_id', $task_id);
-        }
+        !\is_string($task_id) ?: 
+            $this->setClass('task_id', $task_id);
+        return $this;
     }
 
     private function setAction() {
-        if (\is_array($this->action)) {
-            $this->setPayload('action', $this->action);
-        }
+        !\is_array($this->action) ?:
+            $this->setClass('action', $this->action);
+        return $this;
     }
 
     private function setMethod() {
         $method = strtolower($_SERVER['REQUEST_METHOD']);
-        $this->method = $method;
-        $this->setPayload('method', $method);
+        $this->setClass('method', $this->method = $method);
+        return $this;
     }
 
     private function setUrlParam() {
         switch ($this->method) {
             case 'get' && $this->action['fix_same_param']:
-                $this->setPayload('url', self::$payload['url'].$_SERVER['QUERY_STRING']);
-                break;
-            case 'get':
-                $this->setPayload('params', $_GET);
-                $this->setSort(
-                    $this->request_handle['url_param'],
-                    $_GET,
-                    'params'
+                $this->setClass(
+                    'url', $this->getClass('url').$_SERVER['QUERY_STRING']
                 );
                 break;
-            case \in_array($this->method, $this->allow_list, true) && \count($_POST) > 0:
-                $this->combineUrlParam();
-                $this->setPayload('params', $_POST);
+            case 'get':
+                $this->setClass('params', $_GET);
                 $this->setSort(
-                    $this->request_handle['form_param'],
-                    $_POST,
-                    'params'
+                    $this->request_handle['url_param'], $_GET, 'params'
+                );
+                break;
+            case \in_array($this->method, $this->allow_list, true) && \count($_POST):
+                $this->combineUrlParam();
+                $this->setClass('params', $_POST);
+                $this->setSort(
+                    $this->request_handle['form_param'], $_POST, 'params'
                 );
                 break;
             case \in_array($this->method, $this->allow_list, true) && !\count($_POST):
                 $this->combineUrlParam();
                 $this->setSort(
-                    $this->request_handle['body'],
-                    file_get_contents('php://input'),
-                    'params'
+                    $this->request_handle['body'], 
+                    file_get_contents('php://input'), 'params'
                 );
                 $this->patchBody();
                 break;
             default:
         }
+        return $this;
     }
 
-    private function setUrl($full_url) {
-        if (null === $this->getPayload('url')) {
-            $this->setPayload('url', $full_url);
-        }
-        $this->getPayload('url')
-            ? $full_url = $this->getPayload('url')
-                : false;
+    private function setUrl($url) {
+        $this->getClass('url')
+            ? $url = $this->getClass('url')
+                : $this->setClass('url', $url);
         $this->setSort(
-            $this->request_handle['full_url'],
-            $full_url,
-            'url'
+            $this->request_handle['full_url'], $url, 'url'
         );
+        return $this;
     }
 
     private function patchBody() {
-        if (\is_array(json_decode($this->getPayload('body'), true))) {
+        if (\is_object(json_decode($this->getClass('body')))) {
             \is_array($this->request_handle['body_patch'])
                 ? $patch = $this->request_handle['body_patch']
                     : $patch = [];
-            $body = json_decode(
-                $this->getPayload('params'),
-                true
-            );
-            $this->setPayload('params',
-                json_encode(array_replace_recursive(
-                    $body,
-                    $patch
-                ))
+            $body = json_decode($this->getClass('params'), true);
+            $this->setClass('params',
+                json_encode(
+                    array_replace_recursive($body, $patch)
+                )
             );
         }
     }
 
     private function combineUrlParam() {
         $url_params = null;
-        $this->setPayload('url_params', $_GET);
+        $this->setClass('url_params', $_GET);
         $this->setSort($this->request_handle['url_param'], $_GET, 'url_params');
-        $this->getPayload('url_params') !== null ?: self::$payload['url_params'] = [];
-        foreach ((array)$this->getPayload('url_params') as $key => $value) {
+        $this->getClass('url_params') ?: self::$class['url_params'] = [];
+        foreach ((array)$this->getClass('url_params') as $key => $value) {
             $url_params .= $key.'='.$value.'&';
         }
-        false !== strpos($this->getPayload('url'), "\?") && $url_params
-            ? $this->setPayload('url', $this->getPayload('url').'?') : null;
-        $this->setPayload('url', $this->getPayload('url').rtrim($url_params, '&'));
-        unset(self::$payload['url_params']);
+        strpos($this->getClass('url'), "\?") && $url_params
+            ? $this->setClass('url', $this->getClass('url').'?') : null;
+        $this->setClass('url', $this->getClass('url').rtrim($url_params, '&'));
+        unset(self::$class['url_params']);
     }
 
     private function setHeader() {
         if ($this->action['request_header']) {
-            $this->setPayload('headers', Utility::getHeaders());
+            $this->setClass('headers', Utility::getHeaders());
             $this->setSort(
                 $this->request_handle['header'], 
-                Utility::getHeaders(), 
-                'headers'
+                Utility::getHeaders(), 'headers'
             );
         }
+        return $this;
     }
 
     private function setCookie() {
         if ($this->action['request_cookie']) {
-            $this->setPayload('cookies', $_COOKIE);
+            $this->setClass('cookies', $_COOKIE);
             $this->setSort(
                 $this->request_handle['cookie'], 
-                $_COOKIE, 
-                'cookies'
+                $_COOKIE, 'cookies'
             );
         }
+        return $this;
     }
 }

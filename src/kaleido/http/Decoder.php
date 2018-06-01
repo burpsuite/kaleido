@@ -12,7 +12,6 @@ class Decoder extends Worker
     public $response_handle = [];
     public $headers = [];
     public $cookies = [];
-    public $timing;
 
     /**
      * Decoder constructor.
@@ -41,19 +40,13 @@ class Decoder extends Worker
     }
 
     public static function getBody() {
-        return \is_string(self::$payload['body'])
-            ? self::$payload['body'] : 'error_body';
-    }
-
-    private function getPayload($name = 'null') {
-        return self::$payload[$name] ?? null;
+        return parent::getBody();
     }
 
     private function checkError() {
         if ($this->error && \is_int($this->error_code)) {
             new HttpException(
-                'target server status is abnormal.',
-                $this->error_code
+                self::error_message['abnormal'], $this->error_code
             );
         }
     }
@@ -68,25 +61,21 @@ class Decoder extends Worker
     private function setBody() {
         switch ($this->res_type) {
             case 'gzip':
-                $decode_body = Utility::gzbaseDecode($this->body);
+                $body = Utility::gzbaseDecode($this->body);
                 $this->setSort(
                     $this->response_handle['body'], 
-                    $decode_body, 
-                    'body'
+                    $body, 'body'
                 );
                 $this->patchBody();
-                $this->setPayload(
-                    'body',
-                    gzencode(
-                        $this->getPayload('body')
-                    )
+                $this->setClass(
+                    'body', 
+                    gzencode($this->getClass('body'))
                 );
                 break;
             case 'text':
                 $this->setSort(
                     $this->response_handle['body'], 
-                    $this->body, 
-                    'body'
+                    $this->body, 'body'
                 );
                 $this->patchBody();
                 break;
@@ -96,14 +85,13 @@ class Decoder extends Worker
     }
 
     private function patchBody() {
-        if (\is_array(json_decode($this->getPayload('body'), true))) {
+        if (\is_array(json_decode($this->getClass('body'), true))) {
             \is_array($this->response_handle['body_patch'])
                 ? $patch = $this->response_handle['body_patch']
                     : $patch = [];
-            $body = json_decode($this->getPayload('body'), true);
-            $this->setPayload(
-                'body',
-                json_encode(
+            $body = json_decode($this->getClass('body'), true);
+            $this->setClass(
+                'body', json_encode(
                     array_replace_recursive($body, $patch)
                 )
             );
@@ -112,9 +100,9 @@ class Decoder extends Worker
 
     private function setHeaders() {
         if (\is_array($this->headers) && $this->action['response_header']) {
-            $this->setPayload('headers', $this->headers);
+            $this->setClass('headers', $this->headers);
             $this->setSort($this->response_handle['header'], $this->headers, 'headers');
-            foreach ((array)$this->getPayload('headers') as $key => $value) {
+            foreach ((array)$this->getClass('headers') as $key => $value) {
                 header("{$key}: {$value}");
             }
         }
@@ -123,18 +111,11 @@ class Decoder extends Worker
 
     private function setCookies() {
         if (\is_array($this->cookies) && $this->action['response_cookie']) {
-            $this->setPayload('cookies', $this->cookies);
+            $this->setClass('cookies', $this->cookies);
             $this->setSort($this->response_handle['cookie'], $this->cookies, 'cookies');
-            foreach ((array)$this->getPayload('cookies') as $key => $value) {
+            foreach ((array)$this->getClass('cookies') as $key => $value) {
                 setcookie($key, $value);
             }
-        }
-        return $this;
-    }
-
-    private function setTiming() {
-        if (\is_string($this->timing) && $this->action['response_header']) {
-            header("X-Timing: {$this->timing}");
         }
         return $this;
     }

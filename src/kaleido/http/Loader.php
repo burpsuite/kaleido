@@ -5,70 +5,47 @@ namespace Kaleido\Http;
 use Curl\Curl;
 use Predis\Client;
 
-class Loader {
-
-	public $env_name = 'kaleido_dbinfo';
+class Loader extends Worker
+{
 	public $file_type;
 	public $file_path;
 	public $enable_cache = false;
 	public $cache_expire = 3600;
 	public $redis_url;
+	private static $lock = [];
 	public static $redis = [
-		'exist' => false,
+		'exist'  => false,
 		'expire' => 0,
-		'fetch' => null
+		'fetch'  => null
 	];
 
     /**
      * @throws \ErrorException
      */
 	public function loadfile() {
-		$this->setEnv();
+		$this->getEnv('dbinfo');
 		$this->check();
 		$this->handle();
+		$this->lockClass();
 	}
+
+    private function lockClass() {
+        self::$lock = self::$class;
+        self::$class = [];
+    }
 
     /**
      * @throws \ErrorException
      */
 	public function flushDB() {
-	    $this->setEnv();
+	    $this->getEnv('dbinfo');
 	    $this->handle();
     }
 
 	public static function fetch() {
-        return \is_string(self::$redis['fetch'])
-            ? self::$redis['fetch'] : 'error_fetch';
+        return \is_string(self::$lock['fetch'])
+            ? self::$lock['fetch'] : 'error_fetch';
 	}
-
-    private function setEnv() {
-        if (getenv(strtoupper($this->env_name))) {
-        	$env = getenv(strtoupper($this->env_name));
-        	$env_info = Utility::bjsonDecode($env, true);
-            foreach ((array)$env_info as $key => $value) {
-                $this->$key = $value;
-            }
-        }
-    }
-
-    private function getClass($name = 'null') {
-        return self::$redis[$name] ?? null;
-    }
-
-    private function setClass($name, $value) {
-    	\is_string($name) ?: $name = 'error';
-        switch ($name) {
-            case \is_array($value) && !\count($value):
-                self::$redis[$name] = null;
-                break;
-            case null === $value:
-                unset(self::$redis[$name]);
-                break;
-            default:
-                self::$redis[$name] = $value;
-                break;
-        }
-    }
 
 	private function check() {
 		$this->checkType();
@@ -91,11 +68,14 @@ class Loader {
      * @throws \ErrorException
      * @throws \LeanCloud\CloudException
      */
-    public function listenHttp($task_id, $full_url) {
-        new Encoder($task_id, $full_url);
-        new Sender(Encoder::payload(false));
+    public function listenHttp($task_id, $url) {
+        new Encoder($task_id, $url);
+        new Sender(Encoder::class(false));
         new Decoder(Sender::response(false));
-        new Recorder(Encoder::payload(false), Sender::response(false));
+        new Recorder(
+        	Encoder::class(false), 
+        	Sender::response(false)
+        );
         return Decoder::getBody();
     }
 
@@ -115,30 +95,28 @@ class Loader {
 			case 'local':
 				if (!is_file($this->file_path)) {
 					new HttpException(
-						'kaleido configuration \'file_path\' is a invalid path.',
-						-500
+						self::error_message['file_path'], -500
 					);
 				}
 				break;
 			case 'remote':
-				if (!preg_match('/(http|https)\:\/\//', $this->file_path)) {
+				if (!preg_match('/https?\:\/\//', $this->file_path)) {
 					new HttpException(
-						'kaleido configuration \'file_path\' is a invalid path.',
-						-500
+						self::error_message['file_path'], -500
 					);
 				}
 				break;
 			default:
 				new HttpException(
-					'kaleido env_configuration is undefined.', 
-					-500
+					self::error_message['env_undefined'], -500
 				);
 				break;
 		}
+		return $this;
 	}
 
 	private function checkRedis() {
-		if ($this->enable_cache && null !== $this->redis_url) {
+		if ($this->enable_cache && $this->redis_url) {
 			$redis = new Client($this->redis_url);
 			$this->checkExist($redis);
 			$this->checkExpire($redis);
@@ -169,8 +147,7 @@ class Loader {
 	private function isJson($data) {
 		if (!\is_object(json_decode($data))) {
 			new HttpException(
-				'kaleido configuration is a non-json type.',
-				-500
+				self::error_message['non_json'], -500
 			);
 		}
 	}
@@ -216,8 +193,8 @@ class Loader {
 	}
 
 	private function setConsole() {
-		$this->getClass('expire') ?
-			error_log('kaleido_redis_expire: '.$this->getClass('expire'))
-				: error_log('kaleido_redis_expire: 0');
+		$this->getClass('expire')
+		 ? error_log('redis_expire: '.$this->getClass('expire'))
+				: error_log('redis_expire: 0');
 	}
 }
