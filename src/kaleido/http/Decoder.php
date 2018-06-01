@@ -68,8 +68,7 @@ class Decoder extends Worker
 				);
 				$this->patchBody();
 				$this->setClass(
-					'body', 
-					gzencode($this->getClass('body'))
+					'body', gzencode($this->getClass('body'))
 				);
 				break;
 			case 'text':
