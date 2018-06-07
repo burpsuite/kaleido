@@ -6,11 +6,10 @@ class Worker
 {
     public static $timing = [];
     public static $class = [];
-    public $route_info = [];
-    public $task_id;
+    public $taskId;
+    public $route = [];
     const env_name = [
-        'record' => 'KALEIDO_RECORD',
-        'dbinfo' => 'KALEIDO_DBINFO'
+        'record' => 'KALEIDO_RECORD', 'dbinfo' => 'KALEIDO_DBINFO'
     ];
     const error_message = [
         'abnormal' => 'target server status is abnormal.',
@@ -20,13 +19,14 @@ class Worker
         'non_string' => 'payload_url is a non-string type.',
         'payload_host' => 'payload_host is a invalid protocol.',
         'payload_method' => 'payload_method is a non-string type.',
-        'unsupported_type' => 'payload_method is an unsupported type.',
+        'unsupport_type' => 'payload_method is an unsupported type.',
         'object_id' => 'object_id is a non-string type.',
-        'request_action' => 'request_action is not in kaleido::action.',
+        'request_control' => 'request_control is not in kaleido::control.',
         'file_path' => 'kaleido configuration file_path is a invalid path.',
         'env_undefined' => 'kaleido env_configuration is undefined.',
         'non_json' => 'kaleido configuration is a non-json type.'
     ];
+
 
     /**
      * @return mixed
@@ -34,18 +34,18 @@ class Worker
      */
     protected function _load() {
         (new Loader())->loadfile();
-        return $this->route_info = json_decode(
+        return $this->route = json_decode(
             Loader::fetch(), true
         );
     }
 
     /**
-     * @param bool $task_id
+     * @param bool $taskId
      */
-    protected function matchTaskId($task_id = false) {
-        $task_id ?: $task_id = $this->task_id;
-        if (array_key_exists($task_id, $this->route_info)) {
-            foreach ((array)$this->route_info[$task_id] as $key => $value) {
+    protected function matchTaskId($taskId = false) {
+        $taskId ?: $taskId = $this->taskId;
+        if (array_key_exists($taskId, $this->route)) {
+            foreach ((array)$this->route[$taskId] as $key => $value) {
                 $this->$key = $value;
             }
         }
@@ -66,21 +66,25 @@ class Worker
         }
     }
 
-    protected function setSort(array $rep_list, $subject, $save_name = 'null') {
-        \count($rep_list) ?: $this->setClass($save_name, $subject);
-        foreach ($rep_list as $key => $value) {
-            switch ($rep_list) {
+    protected function setReplace($rep_array, $subject, $saveName) {
+        \count($rep_array) 
+            ?: $this->setClass($save_name, $subject);
+        foreach ($rep_array as $key => $value) {
+            switch ($rep_array) {
                 case \is_array($subject):
-                    self::$class[$save_name][$key] = $value;
+                    self::$class[$saveName][$key] = $value;
                     if (!$value) {
-                        unset(self::$class[$save_name][$key]);
+                        unset(
+                            self::$class[$saveName][$key]
+                        );
                     }
                     break;
                 case \is_string($subject):
-                    $filter_res = preg_replace("/{$key}/", $value, $subject);
-                    $this->setClass($save_name, $filter_res);
+                    $this->setClass(
+                        $saveName, $subject = preg_replace(
+                        "/{$key}/", $value, $subject
+                    ));
                     break;
-                default:
             }
         }
     }
@@ -94,30 +98,31 @@ class Worker
         return self::$class[$name] ?? null;
     }
 
-    protected function getEnv($env_name) {
-        if ($env = getenv(self::env_name[$env_name])) {
-            $env_info = Utility::bjsonDecode($env, true);
-            foreach ((array)$env_info as $key => $value) {
-                $this->$key = $value;
-            }
+    protected function getEnv($name) {
+        $envInfo = Utility::bjsonDecode(
+            getenv(self::env_name[$name]), true);
+        foreach ((array)$envInfo as $key => $value) {
+            $this->$key = $value;
         }
     }
 
     protected function setTiming($name = 'Timing') {
-        switch ($name) {
-            case isset(self::$timing[$name]):
-                self::$timing[$name] = 
-                    Utility::millitime() - self::$timing[$name];
-                $this->action['response_header'] ? 
-                header(
-                    "X-{$name}: ".self::$timing[$name].'ms'
-                ) : false;
-                break;
-            default:
-                self::$timing[$name] = 
-                    Utility::millitime();
-                break;
+        !\is_null(self::$timing[$name])
+            ?: self::$timing[$name] = 
+                Utility::millitime();
+        if (is_int(self::$timing[$name])) {
+            $time = 
+                self::$timing[$name];
+            $timing = Utility::millitime() - $time;
+            !$this->control['response_header']
+            ?: header("X-{$name}: ".$timing.'ms');
         }
+        return $this;
+    }
+
+    protected function switchHandle($action = 'null') {
+        $this->handle[$action] ? 
+            $this->handle = $this->handle[$action] : false;
         return $this;
     }
 }

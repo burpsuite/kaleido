@@ -47,49 +47,4 @@ class Utility
         }
         return $headers;
     }
-
-    /**
-     * Utility::isArray Detects data is an array.
-     * @param $data
-     * @param $message
-     * @param $code
-     */
-    public static function isArray($data, $message, $code) {
-        if (!\is_array($data)) {
-            new HttpException(
-                $message,
-                $code
-            );
-        }
-    }
-
-    /**
-     * Utility::isString Detects data is an string.
-     * @param $data
-     * @param $message
-     * @param $code
-     */
-    public static function isString($data, $message, $code) {
-        if (!\is_string($data)) {
-            new HttpException(
-                $message,
-                $code
-            );
-        }
-    }
-
-    /**
-     * Utility::isJson Detects data is an json.
-     * @param $data
-     * @param $message
-     * @param $code
-     */
-    public static function isJson($data, $message, $code) {
-        if (!json_decode($data)) {
-            new HttpException(
-                $message,
-                $code
-            );
-        }
-    }
 }

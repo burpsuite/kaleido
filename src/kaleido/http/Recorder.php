@@ -46,8 +46,8 @@ class Recorder extends Worker
 
     private function setObjectId($response, Object $object_class) {
         if (\is_array($response) && \is_string($object_class->get('objectId'))) {
-            $this->action = $response['action'];
-            $response['action']['response_header']
+            $this->control = $response['control'];
+            $response['control']['response_header']
                 ? header("X-RecId: {$object_class->get('objectId')}") : null;
         }
     }

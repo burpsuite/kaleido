@@ -6,10 +6,10 @@ class Decoder extends Worker
 {
     public $error = false;
     public $error_code = 0;
-    public $action = [];
-    public $res_type;
+    public $control = [];
+    public $responseType;
     public $body;
-    public $response_handle = [];
+    public $handle = [];
     public $headers = [];
     public $cookies = [];
 
@@ -35,6 +35,7 @@ class Decoder extends Worker
 
     private function handle() {
         $this->checkError();
+        $this->switchHandle('response');
         $this->setHeaders()->setTiming()
         ->setUniqueId()->setCookies()->setBody();
     }
@@ -52,28 +53,30 @@ class Decoder extends Worker
     }
 
     private function setUniqueId() {
-        if ($this->action['response_header']) {
+        if ($this->control['response_header']) {
             header('X-UniqueId:'.uniqid('', true));
         }
         return $this;
     }
 
     private function setBody() {
-        switch ($this->res_type) {
+        switch ($this->responseType) {
             case 'gzip':
                 $body = Utility::gzbaseDecode($this->body);
-                $this->setSort(
-                    $this->response_handle['body'], 
+                $this->setReplace(
+                    $this->handle['body'],
                     $body, 'body'
                 );
                 $this->patchBody();
                 $this->setClass(
-                    'body', gzencode($this->getClass('body'))
+                    'body', gzencode(
+                        $this->getClass('body')
+                    )
                 );
                 break;
             case 'text':
-                $this->setSort(
-                    $this->response_handle['body'], 
+                $this->setReplace(
+                    $this->handle['body'], 
                     $this->body, 'body'
                 );
                 $this->patchBody();
@@ -85,8 +88,8 @@ class Decoder extends Worker
 
     private function patchBody() {
         if (\is_array(json_decode($this->getClass('body'), true))) {
-            \is_array($this->response_handle['body_patch'])
-                ? $patch = $this->response_handle['body_patch']
+            \is_array($this->handle['body_patch'])
+                ? $patch = $this->handle['body_patch']
                     : $patch = [];
             $body = json_decode($this->getClass('body'), true);
             $this->setClass(
@@ -98,9 +101,9 @@ class Decoder extends Worker
     }
 
     private function setHeaders() {
-        if (\is_array($this->headers) && $this->action['response_header']) {
+        if (\is_array($this->headers) && $this->control['response_header']) {
             $this->setClass('headers', $this->headers);
-            $this->setSort($this->response_handle['header'], $this->headers, 'headers');
+            $this->setReplace($this->handle['header'], $this->headers, 'headers');
             foreach ((array)$this->getClass('headers') as $key => $value) {
                 header("{$key}: {$value}");
             }
@@ -109,9 +112,9 @@ class Decoder extends Worker
     }
 
     private function setCookies() {
-        if (\is_array($this->cookies) && $this->action['response_cookie']) {
+        if (\is_array($this->cookies) && $this->control['response_cookie']) {
             $this->setClass('cookies', $this->cookies);
-            $this->setSort($this->response_handle['cookie'], $this->cookies, 'cookies');
+            $this->setReplace($this->handle['cookie'], $this->cookies, 'cookies');
             foreach ((array)$this->getClass('cookies') as $key => $value) {
                 setcookie($key, $value);
             }

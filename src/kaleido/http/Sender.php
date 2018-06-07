@@ -7,13 +7,13 @@ use Curl\CaseInsensitiveArray;
 
 class Sender extends Worker
 {
+    private static $lock;
     public $allow_list = ['get', 'post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
     public $url;
-    private static $lock;
     public $method;
-    public $task_id;
+    public $taskId;
     public $params = [];
-    public $action = [];
+    public $control = [];
     public $headers = [];
     public $cookies = [];
 
@@ -54,7 +54,7 @@ class Sender extends Worker
         $curl->setCookies($this->cookies);
         $curl->{$this->method}($this->url, $this->params);
         $this->setError($curl->error, $curl->errorCode);
-        $this->setAction()->setTaskId();
+        $this->setControl()->setTaskId();
         if (!$curl->error) {
             $this->setBody($curl);
             $this->setHeaders($curl->responseHeaders);
@@ -72,15 +72,15 @@ class Sender extends Worker
             : self::$lock;
     }
 
-    public function setAction() {
-        \is_array($this->action) && !$this->getClass('error')
-            ? $this->setClass('action', $this->action) : false;
+    public function setControl() {
+        \is_array($this->control) && !$this->getClass('error')
+            ? $this->setClass('control', $this->control) : false;
             return $this;
     }
 
     private function setTaskId() {
-        !\is_string($this->task_id) ?: 
-            $this->setClass('task_id', $this->task_id);
+        !\is_string($this->taskId) ?: 
+            $this->setClass('taskId', $this->taskId);
             return $this;
     }
 
@@ -111,7 +111,7 @@ class Sender extends Worker
         );
         if (!\in_array($this->method, $this->allow_list, true)) {
             new HttpException(
-                self::error_message['unsupported_type'], -400
+                self::error_message['unsupport_type'], -400
             );
         }
         return $this;
@@ -139,31 +139,31 @@ class Sender extends Worker
         switch ($response) {
             case \is_object($response->response):
                 $body = json_encode($response->response);
-                $this->setClass('res_type', 'text');
+                $this->setClass('responseType', 'text');
                 $this->setClass('body', $body);
                 break;
             case $response->responseHeaders['Content-Encoding'] === 'gzip':
                 $body = base64_encode($response->response);
-                $this->setClass('res_type', 'gzip');
+                $this->setClass('responseType', 'gzip');
                 $this->setClass('body', $body);
                 break;
             default:
-                $this->setClass('res_type', 'text');
+                $this->setClass('responseType', 'text');
                 $this->setClass('body', $response->response);
                 break;
         }
     }
 
-    private function setHeaders(CaseInsensitiveArray $response_headers) {
-        foreach ($response_headers as $key => $value) {
+    private function setHeaders(CaseInsensitiveArray $headers) {
+        foreach ($headers as $key => $value) {
             if ($key !== 'Set-Cookie') {
                 self::$class['headers'][$key] = $value;
             }
         }
     }
 
-    private function setCookies($response_cookies) {
-        switch ($response_cookies) {
+    private function setCookies($cookies) {
+        switch ($cookies) {
             case \is_array($response_cookies):
                 $this->setClass('cookies', $response_cookies);
                 break;

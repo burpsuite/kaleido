@@ -62,19 +62,18 @@ class Loader extends Worker
     }
 
     /**
-     * @param $task_id
-     * @param $full_url
+     * @param $taskId
+     * @param $url
      * @return mixed|string
      * @throws \ErrorException
      * @throws \LeanCloud\CloudException
      */
-    public function listenHttp($task_id, $url) {
-        new Encoder($task_id, $url);
+    public function listenHttp($taskId, $url) {
+        new Encoder($taskId, $url);
         new Sender(Encoder::class(false));
         new Decoder(Sender::response(false));
         new Recorder(
-            Encoder::class(false), 
-            Sender::response(false)
+            Encoder::class(false), Sender::response(false)
         );
         return Decoder::getBody();
     }
