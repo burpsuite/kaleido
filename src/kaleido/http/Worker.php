@@ -68,7 +68,7 @@ class Worker
 
     protected function setReplace($rep_array, $subject, $saveName) {
         \count($rep_array) 
-            ?: $this->setClass($save_name, $subject);
+            ?: $this->setClass($saveName, $subject);
         foreach ($rep_array as $key => $value) {
             switch ($rep_array) {
                 case \is_array($subject):
