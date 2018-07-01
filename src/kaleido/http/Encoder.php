@@ -27,7 +27,8 @@ class Encoder extends Worker
     }
 
     private function check($url) {
-        $this->checkHost($url)->checkMethod();
+        $this->checkHost($url)
+        ->checkMethod();
     }
 
     private function handle($taskId, $url) {
@@ -86,16 +87,20 @@ class Encoder extends Worker
     }
 
     private function setMethod() {
-        $method = strtolower($_SERVER['REQUEST_METHOD']);
-        $this->setClass('method', $this->method = $method);
+        $this->setClass(
+            'method', $this->method = strtolower(
+                $_SERVER['REQUEST_METHOD']
+            )
+        );
         return $this;
     }
 
     private function setUrlParam() {
         switch ($this->method) {
-            case 'get' && $this->control['fix_same_param']:
+            case 'get' && $this->control['fix_urlencode']:
                 $this->setClass(
-                    'url', $this->getClass('url').$_SERVER['QUERY_STRING']
+                    'url', $this->getClass(
+                        'url').$_SERVER['QUERY_STRING']
                 );
                 break;
             case 'get':
