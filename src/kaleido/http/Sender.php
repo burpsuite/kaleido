@@ -32,7 +32,7 @@ class Sender extends Worker
     public function decode($payload) {
         \is_array($payload) 
         ?: new HttpException(
-            self::error_message['non_array'], -500
+            self::error['non_array'], -500
         );
         foreach ((array)$payload as $key => $value) {
             $this->$key = $value;
@@ -73,8 +73,10 @@ class Sender extends Worker
     }
 
     public function setControl() {
-        \is_array($this->control) && !$this->getClass('error')
-            ? $this->setClass('control', $this->control) : false;
+        \is_array($this->control) && 
+                    !$this->getClass('error')
+            ? $this->setClass(
+                'control', $this->control) : false;
             return $this;
     }
 
@@ -93,12 +95,12 @@ class Sender extends Worker
 
     private function checkUrl() {
         \is_string($this->url) 
-        ?: new HttpException(
-            self::error_message['non_string'], -500
+            ?: new HttpException(
+                self::error['non_string'], -500
         );
         if (!preg_match('/https?\:\/\//', $this->url)) {
             new HttpException(
-                self::error_message['payload_host'], -400
+                self::error['payload_host'], -400
             );
         }
         return $this;
@@ -107,11 +109,11 @@ class Sender extends Worker
     private function checkMethod() {
         \is_string($this->method) 
         ?: new HttpException(
-            self::error_message['payload_method'], -500
+            self::error['payload_method'], -500
         );
         if (!\in_array($this->method, $this->allow_list, true)) {
             new HttpException(
-                self::error_message['unsupport_type'], -400
+                self::error['unsupport_type'], -400
             );
         }
         return $this;

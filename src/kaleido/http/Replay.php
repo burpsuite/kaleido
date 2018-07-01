@@ -75,14 +75,14 @@ class Replay extends Worker
     private function checkAction($action) {
         \in_array($action, $this->action, true)
          ?: new HttpException(
-            self::error_message['request_action'], -500
+            self::error['request_action'], -500
         );
     }
 
     private function checkObjectId($object_id) {
         \is_string($object_id) 
         ?: new HttpException(
-            self::error_message['object_id'], -500
+            self::error['object_id'], -500
         );
     }
 

@@ -94,20 +94,20 @@ class Loader extends Worker
             case 'local':
                 if (!is_file($this->file_path)) {
                     new HttpException(
-                        self::error_message['file_path'], -500
+                        self::error['file_path'], -500
                     );
                 }
                 break;
             case 'remote':
                 if (!preg_match('/https?\:\/\//', $this->file_path)) {
                     new HttpException(
-                        self::error_message['file_path'], -500
+                        self::error['file_path'], -500
                     );
                 }
                 break;
             default:
                 new HttpException(
-                    self::error_message['env_undefined'], -500
+                    self::error['env_undefined'], -500
                 );
                 break;
         }
@@ -146,7 +146,7 @@ class Loader extends Worker
     private function isJson($data) {
         if (!\is_object(json_decode($data))) {
             new HttpException(
-                self::error_message['non_json'], -500
+                self::error['non_json'], -500
             );
         }
     }

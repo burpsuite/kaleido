@@ -54,7 +54,7 @@ class Encoder extends Worker
             is_string($this->host) ? $this->host = [$this->host] : false;
             if (!\in_array($host, $this->host, true)) {
                 new HttpException(
-                    self::error_message['request_host'], -400
+                    self::error['request_host'], -400
                 );
             }
         }
@@ -67,7 +67,7 @@ class Encoder extends Worker
             is_string($this->method) ? $this->method = [$this->method] : false;
             if (!\in_array($method, $this->method, true)) {
                 new HttpException(
-                    self::error_message['request_method'], -400
+                    self::error['request_method'], -400
                 );
             }
         }

@@ -11,7 +11,7 @@ class Worker
     const env_name = [
         'record' => 'KALEIDO_RECORD', 'dbinfo' => 'KALEIDO_DBINFO'
     ];
-    const error_message = [
+    const error = [
         'abnormal' => 'target server status is abnormal.',
         'request_host' => 'request_host and kaleido do not match.',
         'request_method' => 'request_method and kaleido do not match',
