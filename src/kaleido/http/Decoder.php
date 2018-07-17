@@ -5,11 +5,9 @@ namespace Kaleido\Http;
 class Decoder extends Worker
 {
     public $error = false;
-    public $error_code = 0;
-    public $control = [];
+    public $errorCode = 0;
     public $responseType;
     public $body;
-    public $handle = [];
     public $headers = [];
     public $cookies = [];
 
@@ -45,9 +43,9 @@ class Decoder extends Worker
     }
 
     private function checkError() {
-        if ($this->error && \is_int($this->error_code)) {
+        if ($this->error && \is_int($this->errorCode)) {
             new HttpException(
-                self::error['abnormal'], $this->error_code
+                self::error['abnormal'], $this->errorCode
             );
         }
     }

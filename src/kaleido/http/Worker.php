@@ -8,6 +8,8 @@ class Worker
     public static $class = [];
     public $taskId;
     public $route = [];
+    public $control = [];
+    public $handle = [];
     const env_name = [
         'record' => 'KALEIDO_RECORD', 'dbinfo' => 'KALEIDO_DBINFO'
     ];
@@ -107,10 +109,10 @@ class Worker
     }
 
     protected function setTiming($name = 'Timing') {
-        !\is_null(self::$timing[$name])
+        null !== self::$timing[$name]
             ?: self::$timing[$name] = 
                 Utility::millitime();
-        if (is_int(self::$timing[$name])) {
+        if (\is_int(self::$timing[$name])) {
             $time = 
                 self::$timing[$name];
             $timing = Utility::millitime() - $time;

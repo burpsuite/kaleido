@@ -6,9 +6,7 @@ class Encoder extends Worker
 {
     public $allow_list = ['post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
     public $method;
-    public $control = [];
     public $host;
-    public $handle = [];
     private static $lock = [];
 
     /**
@@ -51,7 +49,7 @@ class Encoder extends Worker
     private function checkHost($url) {
         if ($this->control['check_hostname']) {
             $host = preg_replace('/^(https?\:\/\/.*?\..*?)\/.*/', '$1', $url);
-            is_string($this->host) ? $this->host = [$this->host] : false;
+            \is_string($this->host) ? $this->host = [$this->host] : false;
             if (!\in_array($host, $this->host, true)) {
                 new HttpException(
                     self::error['request_host'], -400
@@ -64,7 +62,7 @@ class Encoder extends Worker
     private function checkMethod() {
         if ($this->control['check_method']) {
             $method = strtolower($_SERVER['REQUEST_METHOD']);
-            is_string($this->method) ? $this->method = [$this->method] : false;
+            \is_string($this->method) ? $this->method = [$this->method] : false;
             if (!\in_array($method, $this->method, true)) {
                 new HttpException(
                     self::error['request_method'], -400

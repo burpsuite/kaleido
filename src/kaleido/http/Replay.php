@@ -40,10 +40,6 @@ class Replay extends Worker
         self::$class = [];
     }
 
-    public static function getBody() {
-        return parent::getBody();
-    }
-
     /**
      * @param $action
      * @param $object_id

@@ -8,12 +8,10 @@ use Curl\CaseInsensitiveArray;
 class Sender extends Worker
 {
     private static $lock;
-    public $allow_list = ['get', 'post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
+    public $allow = ['get', 'post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
     public $url;
     public $method;
-    public $taskId;
     public $params = [];
-    public $control = [];
     public $headers = [];
     public $cookies = [];
 
@@ -30,10 +28,8 @@ class Sender extends Worker
     }
 
     public function decode($payload) {
-        \is_array($payload) 
-        ?: new HttpException(
-            self::error['non_array'], -500
-        );
+        \is_array($payload) ?: new HttpException(
+            self::error['non_array'], -500);
         foreach ((array)$payload as $key => $value) {
             $this->$key = $value;
         }
@@ -69,7 +65,7 @@ class Sender extends Worker
 
     public static function response($encode) {
         return $encode ? json_encode(self::$lock)
-            : self::$lock;
+            : (array)self::$lock;
     }
 
     public function setControl() {
@@ -86,18 +82,16 @@ class Sender extends Worker
             return $this;
     }
 
-    private function setError($error, $error_code) {
-        if ($error && \is_int($error_code)) {
+    private function setError($error, $errorCode) {
+        if ($error && \is_int($errorCode)) {
             $this->setClass('error', 1);
-            $this->setClass('error_code', $error_code);
+            $this->setClass('errorCode', $errorCode);
         }
     }
 
     private function checkUrl() {
-        \is_string($this->url) 
-            ?: new HttpException(
-                self::error['non_string'], -500
-        );
+        \is_string($this->url) ?: new HttpException(
+                self::error['non_string'], -500);
         if (!preg_match('/https?\:\/\//', $this->url)) {
             new HttpException(
                 self::error['payload_host'], -400
@@ -107,11 +101,9 @@ class Sender extends Worker
     }
 
     private function checkMethod() {
-        \is_string($this->method) 
-        ?: new HttpException(
-            self::error['payload_method'], -500
-        );
-        if (!\in_array($this->method, $this->allow_list, true)) {
+        \is_string($this->method) ?: new HttpException(
+            self::error['payload_method'], -500);
+        if (!\in_array($this->method, $this->allow, true)) {
             new HttpException(
                 self::error['unsupport_type'], -400
             );
@@ -166,8 +158,8 @@ class Sender extends Worker
 
     private function setCookies($cookies) {
         switch ($cookies) {
-            case \is_array($response_cookies):
-                $this->setClass('cookies', $response_cookies);
+            case \is_array($cookies):
+                $this->setClass('cookies', $cookies);
                 break;
         }
     }
