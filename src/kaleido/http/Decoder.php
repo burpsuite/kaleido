@@ -17,9 +17,9 @@ class Decoder extends Worker
      * @throws \ErrorException
      */
     public function __construct(array $response) {
-        $this->_load();
+        parent::_load();
         $this->setResponse($response);
-        $this->matchTaskId();
+        parent::matchTaskId();
         $this->handle();
     }
 
@@ -33,13 +33,9 @@ class Decoder extends Worker
 
     private function handle() {
         $this->checkError();
-        $this->switchHandle('response');
+        parent::switchHandle('response');
         $this->setHeaders()->setTiming()
         ->setUniqueId()->setCookies()->setBody();
-    }
-
-    public static function getBody() {
-        return parent::getBody();
     }
 
     private function checkError() {
