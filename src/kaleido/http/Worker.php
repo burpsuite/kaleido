@@ -10,13 +10,11 @@ class Worker
     public $route = [];
     public $control = [];
     public $handle = [];
-    const env_name = [
-        'record' => 'KALEIDO_RECORD', 'dbinfo' => 'KALEIDO_DBINFO'
-    ];
     const error = [
         'abnormal' => 'target server status is abnormal.',
         'request_host' => 'request_host and kaleido do not match.',
         'request_method' => 'request_method and kaleido do not match',
+        'request_action' => 'request_action and kaleido do not match',
         'non_array' => 'payload is a non-array type.',
         'non_string' => 'payload_url is a non-string type.',
         'payload_host' => 'payload_host is a invalid protocol.',
@@ -34,8 +32,8 @@ class Worker
      * @return mixed
      * @throws \ErrorException
      */
-    protected function _load() {
-        (new Loader())->loadfile();
+    protected function load() {
+        (new Loader())->_load();
         return $this->route = json_decode(
             Loader::fetch(), true
         );
@@ -100,21 +98,19 @@ class Worker
         return self::$class[$name] ?? null;
     }
 
-    protected function getEnv($name) {
-        $envInfo = Utility::bjsonDecode(
-            getenv(self::env_name[$name]), true);
-        foreach ((array)$envInfo as $key => $value) {
+    protected function getEnv($className) {
+        $env = Utility::bjsonDecode(
+            getenv(strtoupper($className)), true);
+        foreach ($env as $key => $value) {
             $this->$key = $value;
         }
     }
 
     protected function setTiming($name = 'Timing') {
         null !== self::$timing[$name]
-            ?: self::$timing[$name] = 
-                Utility::millitime();
+            ?: self::$timing[$name] = Utility::millitime();
         if (\is_int(self::$timing[$name])) {
-            $time = 
-                self::$timing[$name];
+            $time = self::$timing[$name];
             $timing = Utility::millitime() - $time;
             !$this->control['response_header']
             ?: header("X-{$name}: ".$timing.'ms');

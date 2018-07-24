@@ -7,26 +7,41 @@ use Predis\Client;
 
 class Loader extends Worker
 {
-    public $file_type;
-    public $file_path;
-    public $enable_cache = false;
-    public $cache_expire = 3600;
-    public $redis_url;
+    public $allow = ['regular'];
+    public $type;
+    public $path;
+    public $cache = [];
     private static $lock = [];
-    public static $redis = [
-        'exist'  => false,
-        'expire' => 0,
-        'fetch'  => null
-    ];
 
     /**
      * @throws \ErrorException
      */
-    public function loadfile() {
-        $this->getEnv('dbinfo');
-        $this->check();
+    public function _load() {
+        $this->getEnv(__CLASS__); 
+        $this->detect();
         $this->handle();
         $this->lockClass();
+    }
+
+    private function detect() {
+        $this->detectType();
+        $this->detectRedis();
+    }
+
+    private function detectType() { 
+        \in_array($this->getCache('saveType'
+        ), $this->allow, true) ?: $this->setCache(
+            'saveInfo', getenv(
+                $this->getCache('saveInfo'))
+        );
+    }
+
+    private function detectRedis() { 
+        $redis = new Client(
+            $this->getCache('saveInfo'));
+        $this->redisExist($redis);
+        $this->redisExpire($redis);
+        $redis->disconnect();
     }
 
     private function lockClass() {
@@ -34,31 +49,9 @@ class Loader extends Worker
         self::$class = [];
     }
 
-    /**
-     * @throws \ErrorException
-     */
-    public function flushDB() {
-        $this->getEnv('dbinfo');
-        $this->handle();
-    }
-
     public static function fetch() {
         return \is_string(self::$lock['fetch'])
             ? self::$lock['fetch'] : 'error_fetch';
-    }
-
-    private function check() {
-        $this->checkType();
-        $this->checkRedis();
-    }
-
-    /**
-     * @throws \ErrorException
-     */
-    private function handle() {
-        $this->fetchData();
-        $this->updateRedis();
-        $this->setConsole();
     }
 
     /**
@@ -72,83 +65,66 @@ class Loader extends Worker
         new Encoder($taskId, $url);
         new Sender(Encoder::class(false));
         new Decoder(Sender::response(false));
-        new Recorder(
-            Encoder::class(false), Sender::response(false)
-        );
+        new Recorder(Encoder::class(false),
+            Sender::response(false));
         return Decoder::getBody();
     }
 
     /**
      * @param $action
-     * @param $object_id
+     * @param $objectId
      * @return mixed
      * @throws \ErrorException
      */
-    public function replayHttp($action, $object_id) {
-        new Replay($action, $object_id);
+    public function replayHttp($action, $objectId) {
+        new Replay($action, $objectId);
         return Replay::getBody();
     }
 
-    private function checkType() {
-        switch ($this->file_type) {
-            case 'local':
-                if (!is_file($this->file_path)) {
-                    new HttpException(
-                        self::error['file_path'], -500
-                    );
-                }
-                break;
-            case 'remote':
-                if (!preg_match('/https?\:\/\//', $this->file_path)) {
-                    new HttpException(
-                        self::error['file_path'], -500
-                    );
-                }
-                break;
-            default:
-                new HttpException(
-                    self::error['env_undefined'], -500
-                );
-                break;
-        }
-        return $this;
+    private function getCache($name) {
+        return $this->cache[$name] ?? false;
     }
 
-    private function checkRedis() {
-        if ($this->enable_cache && $this->redis_url) {
-            $redis = new Client($this->redis_url);
-            $this->checkExist($redis);
-            $this->checkExpire($redis);
-            $redis->disconnect();
-        }
+    private function setCache($name, $value) {
+        return \is_string($name)
+            ? $this->cache[$name] = $value
+                : false;
+    }
+
+    /**
+     * @throws \ErrorException
+     */
+    private function handle() {
+        $this->fetchData();
+        $this->redisSave();
+        $this->setConsole();
     }
 
     /**
      * @throws \ErrorException
      */
     private function fetchData() {
-        if (!$this->getClass('expire')) {
-            switch ($this->file_type) {
+        if (!$this->getClass('expired')) {
+            switch ($this->type) {
                 case 'local':
-                    $file = file_get_contents($this->file_path);
+                    $file = file_get_contents($this->path);
                     $this->setClass('fetch', $file);
                     $this->isJson($this->getClass('fetch'));
                     break;
                 case 'remote':
                     $curl = new Curl;
-                    $curl->get($this->file_path);
+                    $curl->get($this->path);
                     $this->getResponse($curl->response);
                     break;
             }
         }
     }
 
-    private function isJson($data) {
-        if (!\is_object(json_decode($data))) {
-            new HttpException(
-                self::error['non_json'], -500
-            );
-        }
+    private function setConsole() {
+        $this->getClass('expired')
+         ? error_log('redisExpire: '.
+        $this->getClass('expired'))
+         : error_log('redisExpire: 0');
     }
 
     private function getResponse($response) {
@@ -164,36 +140,47 @@ class Loader extends Worker
         }
     }
 
-    private function checkExist(Client $redis_obj) {
-        if ($redis_obj->get(sha1($this->file_path))) {
-            $this->setClass('fetch', $redis_obj->get(sha1($this->file_path)));
-            \is_string($redis_obj->get(sha1($this->file_path)))
-                ? $this->setClass('exist', true) : false;
+    private function isJson($data) {
+        if (!\is_object(json_decode($data))) {
+            new HttpException(
+                self::error['non_json'], -500
+            );
         }
     }
 
-    private function checkExpire(Client $redis_obj) {
+    private function redisExist(Client $redis) { 
+        if ($redis->get(sha1($this->path))) {
+            $this->setClass('fetch',
+                $redis->get(sha1($this->path)));
+            $this->setClass('exist', true);
+        }
+    }
+
+    private function redisExpire(Client $redis) { 
         if ($this->getClass('exist')) {
-            $expire = json_decode($redis_obj->get(sha1($this->file_path.'expire')), true);
-            if ($expire['expire_time'] - time() > 0) {
-                $this->setClass('expire', $expire['expire_time'] - time());
+            $expire = json_decode($redis->get(
+                sha1($this->path.'expired')), true);
+            if ($expire['expired'] - time() > 0) {
+                $this->setClass('expired',
+                    $expire['expired'] - time());
             }
         }
     }
 
-    private function updateRedis() {
-        if ($this->enable_cache && !$this->getClass('expire')) {
-            $redis = new Client($this->redis_url);
-            $expire_time = json_encode(['expire_time' => time() + $this->cache_expire]);
-            $redis->set(sha1($this->file_path), $this->getClass('fetch'));
-            $redis->set(sha1($this->file_path.'expire'), $expire_time);
+    private function redisSave() {
+        if (!$this->getClass('expired')) {
+            $redis = new Client(
+                $this->getCache('saveInfo'));
+            $expire = json_encode([
+                'expired' => time() +
+                    $this->getCache('interval')
+            ]);
+            $redis->set(sha1($this->path),
+                $this->getClass('fetch'));
+            $redis->set(
+                sha1($this->path.
+                    'expired'), $expire);
             $redis->disconnect();
         }
-    }
-
-    private function setConsole() {
-        $this->getClass('expire')
-         ? error_log('redis_expire: '.$this->getClass('expire'))
-                : error_log('redis_expire: 0');
     }
 }

@@ -20,7 +20,7 @@ class Recorder extends Worker
      */
     public function __construct(array $request, array $response) {
         $this->setTiming('RecTiming');
-        $this->getEnv('record');
+        $this->getEnv(__CLASS__);
         $this->setRecord($request, $response);
         $this->setTiming('RecTiming');
     }
@@ -32,9 +32,8 @@ class Recorder extends Worker
      */
     private function setRecord($request, $response) {
         if (\is_string($this->app_id)) {
-            Client::initialize(
-                $this->app_id, $this->app_key, $this->master_key
-            );
+            Client::initialize($this->app_id, 
+                $this->app_key, $this->master_key);
             Client::setServerUrl($this->server);
             $object = new Object($this->class);
             $object->set('request', $request);

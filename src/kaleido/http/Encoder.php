@@ -16,9 +16,9 @@ class Encoder extends Worker
      * @throws \ErrorException
      */
     public function __construct($taskId, $url) {
-        $this->setTiming();
-        $this->_load();
-        $this->matchTaskId($taskId);
+        parent::setTiming();
+        parent::load();
+        parent::matchTaskId($taskId);
         $this->check($url);
         $this->handle($taskId, $url);
         $this->lockClass();

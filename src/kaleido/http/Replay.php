@@ -83,9 +83,8 @@ class Replay extends Worker
     }
 
     private function getObject($object_id) {
-        Client::initialize(
-            $this->app_id, $this->app_key, $this->master_key
-        );
+        Client::initialize($this->app_id, 
+            $this->app_key, $this->master_key);
         Client::setServerUrl($this->server);
         $fetch = (new Query($this->class))->get($object_id);
         $this->setClass('request', $fetch->get('request'));

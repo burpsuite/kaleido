@@ -17,7 +17,7 @@ class Decoder extends Worker
      * @throws \ErrorException
      */
     public function __construct(array $response) {
-        parent::_load();
+        parent::load();
         $this->setResponse($response);
         parent::matchTaskId();
         $this->handle();
