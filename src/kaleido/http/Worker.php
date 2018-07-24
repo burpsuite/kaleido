@@ -99,9 +99,10 @@ class Worker
     }
 
     protected function getEnv($className) {
-        $env = Utility::bjsonDecode(
-            getenv(strtoupper($className)), true);
-        foreach ($env as $key => $value) {
+        $data = Utility::bjsonDecode(
+            getenv(strtoupper(str_replace(
+                '\\', '_', $className))), true);
+        foreach ($data as $key => $value) {
             $this->$key = $value;
         }
     }
