@@ -102,6 +102,7 @@ class Worker
         $data = Utility::bjsonDecode(
             getenv(strtoupper(str_replace(
                 '\\', '_', $className))), true);
+        null !== $data ?: $data = []; 
         foreach ($data as $key => $value) {
             $this->$key = $value;
         }
