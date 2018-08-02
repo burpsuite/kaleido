@@ -8,13 +8,14 @@ use LeanCloud\LeanObject;
 
 class Recorder extends Worker
 {
-    public $className;
-    public $appId;
-    public $appKey;
+    public $saveLimit = 2097152;
     public $masterKey;
-    public $endPoint;
     public $saveType;
     public $saveInfo;
+    public $appKey;
+    public $appId;
+    public $endPoint;
+    public $className;
 
     /**
      * Recorder constructor.

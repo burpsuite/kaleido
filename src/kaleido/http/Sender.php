@@ -21,13 +21,13 @@ class Sender extends Worker
      * @throws \ErrorException
      */
     public function __construct(array $payload) {
-        $this->decode($payload);
+        $this->unPayload($payload);
         $this->check();
         $this->handle();
         $this->lockClass();
     }
 
-    public function decode($payload) {
+    public function unPayload($payload) {
         \is_array($payload) ?: new HttpException(
             self::error['non_array'], -500);
         foreach ($payload as $key => $value) {
@@ -52,7 +52,8 @@ class Sender extends Worker
         $this->setError($curl->error, $curl->errorCode);
         $this->setTaskId();
         if (!$curl->error) {
-            $this->setBody($curl);
+            $this->setBody($curl->response,
+                $curl->responseHeaders);
             $this->setHeaders($curl->responseHeaders);
             $this->setCookies($curl->responseCookies);
         }
@@ -121,21 +122,27 @@ class Sender extends Worker
             return $this;
     }
 
-    private function setBody(Curl $response) {
-        switch ($response) {
-            case \is_object($response->response):
-                $body = json_encode($response->response);
-                $this->setClass('responseType', 'text');
-                $this->setClass('body', $body);
+    private function isGzip($encode) :bool {
+        \is_array($encode) ?: $encode = [];
+        return $encode['Content-Encoding']
+            !== 'gzip' ? 0 : true;
+    }
+
+    private function setBody(Curl $respBody, Curl $respHeader) {
+        switch ($respBody) {
+            case \is_object($respBody):
+                $this->setClass('respType', 'text');
+                $this->setClass('body', 
+                    json_encode($respBody));
                 break;
-            case $response->responseHeaders['Content-Encoding'] === 'gzip':
-                $body = base64_encode($response->response);
-                $this->setClass('responseType', 'gzip');
-                $this->setClass('body', $body);
+            case $this->isGzip($respHeader):
+                $this->setClass('respType', 'gzip');
+                $this->setClass('body', 
+                    base64_encode($respBody));
                 break;
             default:
-                $this->setClass('responseType', 'text');
-                $this->setClass('body', $response->response);
+                $this->setClass('respType', 'text');
+                $this->setClass('body', $respBody);
                 break;
         }
     }
