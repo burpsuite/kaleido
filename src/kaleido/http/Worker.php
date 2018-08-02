@@ -8,7 +8,6 @@ class Worker
     public static $class = [];
     public $taskId;
     public $route = [];
-    public $control = [];
     public $handle = [];
     const error = [
         'abnormal' => 'target server status is abnormal.',
@@ -114,7 +113,7 @@ class Worker
         if (\is_int(self::$timing[$name])) {
             $time = self::$timing[$name];
             $timing = Utility::millitime() - $time;
-            !$this->control['response_header']
+            !$this->handle['enable_header']
             ?: header("X-{$name}: ".$timing.'ms');
         }
         return $this;

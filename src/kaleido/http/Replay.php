@@ -91,6 +91,7 @@ class Replay extends Worker
     private function handle($action) {
         switch ($action) {
             case 'history':
+                $this->switchHandle('request');
                 $this->setTiming();
                 new Decoder($this->getClass(
                     'response'));
@@ -98,6 +99,7 @@ class Replay extends Worker
                     Decoder::getBody());
                 break;
             case 'current':
+                $this->switchHandle('request');
                 $this->setTiming();
                 $this->lockClass();
                 new Sender($this->getClass('request'));
