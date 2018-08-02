@@ -47,7 +47,7 @@ class Decoder extends Worker
     }
 
     private function setUniqueId() {
-        if ($this->control['response_header']) {
+        if ($this->handle['enable_header']) {
             header('X-UniqueId:'.uniqid('', true));
         }
         return $this;
@@ -71,8 +71,7 @@ class Decoder extends Worker
             case 'text':
                 $this->setReplace(
                     $this->handle['body'], 
-                    $this->body, 'body'
-                );
+                    $this->body, 'body');
                 $this->patchBody();
                 break;
             default:
@@ -95,10 +94,12 @@ class Decoder extends Worker
     }
 
     private function setHeaders() {
-        if (\is_array($this->headers) && $this->control['response_header']) {
+        if ($this->handle['enable_header']) {
             $this->setClass('headers', $this->headers);
-            $this->setReplace($this->handle['header'], $this->headers, 'headers');
-            foreach ((array)$this->getClass('headers') as $key => $value) {
+            $this->setReplace($this->handle['header'], 
+                $this->headers, 'headers');
+            foreach ($this->getClass(
+                'headers') as $key => $value) {
                 header("{$key}: {$value}");
             }
         }
@@ -106,10 +107,12 @@ class Decoder extends Worker
     }
 
     private function setCookies() {
-        if (\is_array($this->cookies) && $this->control['response_cookie']) {
+        if ($this->handle['enable_cookie']) {
             $this->setClass('cookies', $this->cookies);
-            $this->setReplace($this->handle['cookie'], $this->cookies, 'cookies');
-            foreach ((array)$this->getClass('cookies') as $key => $value) {
+            $this->setReplace($this->handle['cookie'], 
+                $this->cookies, 'cookies');
+            foreach ($this->getClass(
+                'cookies') as $key => $value) {
                 setcookie($key, $value);
             }
         }

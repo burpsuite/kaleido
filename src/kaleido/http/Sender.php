@@ -30,7 +30,7 @@ class Sender extends Worker
     public function decode($payload) {
         \is_array($payload) ?: new HttpException(
             self::error['non_array'], -500);
-        foreach ((array)$payload as $key => $value) {
+        foreach ($payload as $key => $value) {
             $this->$key = $value;
         }
     }
@@ -50,7 +50,7 @@ class Sender extends Worker
         $curl->setCookies($this->cookies);
         $curl->{$this->method}($this->url, $this->params);
         $this->setError($curl->error, $curl->errorCode);
-        $this->setControl()->setTaskId();
+        $this->setTaskId();
         if (!$curl->error) {
             $this->setBody($curl);
             $this->setHeaders($curl->responseHeaders);
@@ -66,14 +66,6 @@ class Sender extends Worker
     public static function response($encode) {
         return $encode ? json_encode(self::$lock)
             : (array)self::$lock;
-    }
-
-    public function setControl() {
-        \is_array($this->control) && 
-                    !$this->getClass('error')
-            ? $this->setClass(
-                'control', $this->control) : false;
-            return $this;
     }
 
     private function setTaskId() {

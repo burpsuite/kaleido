@@ -29,11 +29,11 @@ class Loader extends Worker
     }
 
     private function detectType() { 
-        \in_array($this->getCache('saveType'
-        ), $this->allow, true) ?: $this->setCache(
-            'saveInfo', getenv(
-                $this->getCache('saveInfo'))
-        );
+        \in_array($this->getCache(
+        'saveType'), $this->allow, true)
+        ?: $this->setCache('saveInfo',
+        getenv($this->getCache(
+            'saveInfo')));
     }
 
     private function detectRedis() { 
@@ -115,7 +115,7 @@ class Loader extends Worker
                     $curl = new Curl;
                     $curl->get($this->path);
                     $this->getResponse($curl->response);
-                    break;
+                    break;  
             }
         }
     }
@@ -130,12 +130,16 @@ class Loader extends Worker
     private function getResponse($response) {
         switch ($response) {
             case \is_object($response):
-                $this->setClass('fetch', json_encode($response));
-                $this->isJson($this->getClass('fetch'));
+                $this->setClass('fetch', 
+                    json_encode($response));
+                $this->isJson(
+                    $this->getClass('fetch'));
                 break;
             case \is_string($response):
-                $this->setClass('fetch', $response);
-                $this->isJson($this->getClass('fetch'));
+                $this->setClass(
+                    'fetch', $response);
+                $this->isJson(
+                    $this->getClass('fetch'));
                 break;
         }
     }
@@ -171,15 +175,13 @@ class Loader extends Worker
         if (!$this->getClass('expired')) {
             $redis = new Client(
                 $this->getCache('saveInfo'));
-            $expire = json_encode([
-                'expired' => time() +
-                    $this->getCache('interval')
-            ]);
+            $expire = json_encode(
+                ['expired' => time() + 
+            $this->getCache('interval')]);
             $redis->set(sha1($this->path),
                 $this->getClass('fetch'));
-            $redis->set(
-                sha1($this->path.
-                    'expired'), $expire);
+            $redis->set(sha1($this->path.
+                'expired'), $expire);
             $redis->disconnect();
         }
     }

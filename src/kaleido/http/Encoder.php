@@ -4,7 +4,7 @@ namespace Kaleido\Http;
 
 class Encoder extends Worker
 {
-    public $allow_list = ['post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
+    public $allow = ['post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
     public $method;
     public $host;
     private static $lock = [];
@@ -33,7 +33,7 @@ class Encoder extends Worker
         $this->switchHandle('request');
         $this->setTaskId($taskId)->setMethod()
         ->setUrl($url)->setUrlParam()->setUrl($url)
-        ->setCookie()->setHeader()->setControl();
+        ->setCookie()->setHeader();
     }
 
     private function lockClass() {
@@ -47,7 +47,7 @@ class Encoder extends Worker
     }
 
     private function checkHost($url) {
-        if ($this->control['check_hostname']) {
+        if ($this->handle['check_hostname']) {
             $host = preg_replace('/^(https?\:\/\/.*?\..*?)\/.*/', '$1', $url);
             \is_string($this->host) ? $this->host = [$this->host] : false;
             if (!\in_array($host, $this->host, true)) {
@@ -60,7 +60,7 @@ class Encoder extends Worker
     }
 
     private function checkMethod() {
-        if ($this->control['check_method']) {
+        if ($this->handle['check_method']) {
             $method = strtolower($_SERVER['REQUEST_METHOD']);
             \is_string($this->method) ? $this->method = [$this->method] : false;
             if (!\in_array($method, $this->method, true)) {
@@ -78,12 +78,6 @@ class Encoder extends Worker
         return $this;
     }
 
-    private function setControl() {
-        !\is_array($this->control) 
-            ?: $this->setClass('control', $this->control);
-        return $this;
-    }
-
     private function setMethod() {
         $this->setClass(
             'method', $this->method = strtolower(
@@ -95,7 +89,7 @@ class Encoder extends Worker
 
     private function setUrlParam() {
         switch ($this->method) {
-            case 'get' && $this->control['fix_urlencode']:
+            case 'get' && $this->handle['fix_urlencode']:
                 $this->setClass(
                     'url', $this->getClass(
                         'url').$_SERVER['QUERY_STRING']
@@ -107,14 +101,14 @@ class Encoder extends Worker
                     $this->handle['url_param'], $_GET, 'params'
                 );
                 break;
-            case \in_array($this->method, $this->allow_list, true) && \count($_POST):
+            case \in_array($this->method, $this->allow, true) && \count($_POST):
                 $this->combineUrlParam();
                 $this->setClass('params', $_POST);
                 $this->setReplace(
                     $this->handle['form_param'], $_POST, 'params'
                 );
                 break;
-            case \in_array($this->method, $this->allow_list, true) && !\count($_POST):
+            case \in_array($this->method, $this->allow, true) && !\count($_POST):
                 $this->combineUrlParam();
                 $this->setReplace(
                     $this->handle['body'], 
@@ -166,23 +160,19 @@ class Encoder extends Worker
     }
 
     private function setHeader() {
-        if ($this->control['request_header']) {
+        if ($this->handle['enable_header']) {
             $this->setClass('headers', Utility::getHeaders());
-            $this->setReplace(
-                $this->handle['header'], 
-                Utility::getHeaders(), 'headers'
-            );
+            $this->setReplace($this->handle['header'], 
+                Utility::getHeaders(), 'headers');
         }
         return $this;
     }
 
     private function setCookie() {
-        if ($this->control['request_cookie']) {
+        if ($this->handle['enable_cookie']) {
             $this->setClass('cookies', $_COOKIE);
-            $this->setReplace(
-                $this->handle['cookie'], 
-                $_COOKIE, 'cookies'
-            );
+            $this->setReplace($this->handle['cookie'], 
+                $_COOKIE, 'cookies');
         }
         return $this;
     }

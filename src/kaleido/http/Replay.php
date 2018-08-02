@@ -51,8 +51,7 @@ class Replay extends Worker
                 $this->setTiming();
                 new Decoder($this->getClass('response'));
                 $this->setClass(
-                    'body', Decoder::getBody()
-                );
+                    'body', Decoder::getBody());
                 break;
             case 'current':
                 $this->setTiming();
