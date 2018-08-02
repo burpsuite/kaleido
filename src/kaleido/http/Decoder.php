@@ -34,8 +34,9 @@ class Decoder extends Worker
     private function handle() {
         $this->checkError();
         parent::switchHandle('response');
-        $this->setHeaders()->setTiming()
-        ->setUniqueId()->setCookies()->setBody();
+        $this->setHeaders()->setCookies();
+        $this->setTiming()->setUniqueId()
+        ->setBody();
     }
 
     private function checkError() {
@@ -98,8 +99,10 @@ class Decoder extends Worker
             $this->setClass('headers', $this->headers);
             $this->setReplace($this->handle['header'], 
                 $this->headers, 'headers');
-            foreach ($this->getClass(
-                'headers') as $key => $value) {
+            !\count($this->getClass('headers'))
+                ? $data = $this->getClass('headers')
+                    : $data = [];
+            foreach ($data as $key => $value) {
                 header("{$key}: {$value}");
             }
         }
@@ -111,8 +114,10 @@ class Decoder extends Worker
             $this->setClass('cookies', $this->cookies);
             $this->setReplace($this->handle['cookie'], 
                 $this->cookies, 'cookies');
-            foreach ($this->getClass(
-                'cookies') as $key => $value) {
+            !\count($this->getClass('cookies'))
+                ? $data = $this->getClass('cookies')
+                    : $data = [];
+            foreach ($data as $key => $value) {
                 setcookie($key, $value);
             }
         }
