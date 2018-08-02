@@ -101,8 +101,8 @@ class Replay extends Worker
             case 'current':
                 $this->switchHandle('request');
                 $this->setTiming();
-                $this->lockClass();
                 new Sender($this->getClass('request'));
+                $this->lockClass();
                 new Decoder(Sender::response(false));
                 $this->setClass('body',
                     Decoder::getBody());
