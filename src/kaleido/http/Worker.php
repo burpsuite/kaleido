@@ -23,9 +23,9 @@ class Worker
         'request_control' => 'request_control is not in kaleido::control.',
         'file_path' => 'kaleido configuration file_path is a invalid path.',
         'env_undefined' => 'kaleido env_configuration is undefined.',
-        'non_json' => 'kaleido configuration is a non-json type.'
+        'non_json' => 'kaleido configuration is a non-json type.',
+        'save_exception' => 'kaleido record save exception.'
     ];
-
 
     /**
      * @return mixed

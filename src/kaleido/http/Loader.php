@@ -17,7 +17,7 @@ class Loader extends Worker
      * @throws \ErrorException
      */
     public function _load() {
-        $this->getEnv(__CLASS__); 
+        $this->getEnv('dbinfo'); 
         $this->detect();
         $this->handle();
         $this->lockClass();

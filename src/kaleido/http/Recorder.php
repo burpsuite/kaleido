@@ -3,26 +3,63 @@
 namespace Kaleido\Http;
 
 use LeanCloud\Client;
+use LeanCloud\CloudException;
 use LeanCloud\Object;
 
 class Recorder extends Worker
 {
-    public $app_id;
-    public $app_key;
-    public $master_key;
-    public $server;
+    public $className;
+    public $appId;
+    public $appKey;
+    public $masterKey;
+    public $endPoint;
+    public $saveType;
+    public $saveInfo;
 
     /**
      * Recorder constructor.
      * @param array $request
      * @param array $response
-     * @throws \LeanCloud\CloudException
      */
     public function __construct(array $request, array $response) {
         $this->setTiming('RecTiming');
-        $this->getEnv(__CLASS__);
-        $this->setRecord($request, $response);
+        $this->getEnv('record');
+        $this->caseType($request, $response);
         $this->setTiming('RecTiming');
+    }
+
+    private function caseType($request, $response) {
+        switch ($this->saveType) {
+            case 'leancloud':
+                $this->switchType();
+                $this->initialize();
+                try {
+                    $this->saveRecord($request, $response);
+                } catch (CloudException $exception) {
+                    new HttpException(
+                        self::error['save_exception'], -500
+                    );
+                }
+                break;
+        }
+    }
+
+    private function switchType() {
+        $type = $this->saveInfo[$this->saveType];
+        \is_array($type) ?: $type = [];
+        foreach ($type as $key => $value) {
+            $this->$key = $value;
+        }
+    }
+
+    private function initialize() {
+        switch($this->saveType) {
+            case 'leancloud':
+                Client::initialize($this->appId,
+                    $this->appKey, $this->masterKey);
+                Client::setServerUrl($this->endPoint);
+                break;
+        }
     }
 
     /**
@@ -30,24 +67,24 @@ class Recorder extends Worker
      * @param $response
      * @throws \LeanCloud\CloudException
      */
-    private function setRecord($request, $response) {
-        if (\is_string($this->app_id)) {
-            Client::initialize($this->app_id, 
-                $this->app_key, $this->master_key);
-            Client::setServerUrl($this->server);
-            $object = new Object($this->class);
-            $object->set('request', $request);
-            $object->set('response', $response);
-            $object->save();
-            $this->setObjectId($response, $object);
+    private function saveRecord($request, $response) {
+        switch ($this->saveType) {
+            case 'leancloud':
+                $object = new Object($this->className);
+                $object->set('request', $request);
+                $object->set('response', $response);
+                $object->save();
+                $this->setObjectId($response, $object);
+                break;
         }
     }
 
-    private function setObjectId($response, Object $object_class) {
-        if (\is_array($response) && \is_string($object_class->get('objectId'))) {
-            $this->control = $response['control'];
-            $response['control']['response_header']
-                ? header("X-RecId: {$object_class->get('objectId')}") : null;
+    private function setObjectId($response, Object $class) {
+        if (\is_string($class->get('objectId'))) {
+            \is_array($response) ?: $response = [];
+            $header = $response['handle']['enable_header'];
+            $header ? header(
+                "X-RecId: {$class->get('objectId')}") : null;
         }
     }
 }

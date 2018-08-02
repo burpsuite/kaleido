@@ -13,7 +13,6 @@ class Encoder extends Worker
      * Encoder constructor.
      * @param $taskId
      * @param $url
-     * @throws \ErrorException
      */
     public function __construct($taskId, $url) {
         parent::setTiming();
