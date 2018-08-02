@@ -6,7 +6,7 @@ class Decoder extends Worker
 {
     public $error = false;
     public $errorCode = 0;
-    public $responseType;
+    public $respType;
     public $body;
     public $headers = [];
     public $cookies = [];
@@ -55,7 +55,7 @@ class Decoder extends Worker
     }
 
     private function setBody() {
-        switch ($this->responseType) {
+        switch ($this->respType) {
             case 'gzip':
                 $body = Utility::gzbaseDecode($this->body);
                 $this->setReplace(
