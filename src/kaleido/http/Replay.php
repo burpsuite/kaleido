@@ -8,63 +8,27 @@ use LeanCloud\Query;
 class Replay extends Worker
 {
     public $action = ['history', 'current'];
-    public static $body;
     private static $lock;
-    public $app_id;
-    public $app_key;
-    public $master_key;
-    public $server;
-    public $request;
-    public $response;
+    public static $body;
+    public $saveType;
+    public $saveInfo = [];
+    public $appId;
+    public $appKey;
+    public $masterKey;
+    public $endPoint;
+    public $className;
 
     /**
      * Replay constructor.
      * @param $action
-     * @param $object_id
+     * @param $objectId
      * @throws \ErrorException
      */
-    public function __construct($action, $object_id) {
-        $this->check($action, $object_id);
-        $this->getEnv('record');
-        $this->getObject($object_id);
-        $this->handle($action, $object_id);
-    }
-
-    private function check($action, $object_id) {
+    public function __construct($action, $objectId) {
         $this->checkAction($action);
-        $this->checkObjectId($object_id);
-    }
-
-    private function lockClass() {
-        self::$lock = self::$class;
-        self::$class = [];
-    }
-
-    /**
-     * @param $action
-     * @param $object_id
-     * @throws \ErrorException
-     */
-    private function handle($action, $object_id) {
-        switch ($action) {
-            case 'history':
-                $this->setTiming();
-                new Decoder($this->getClass('response'));
-                $this->setClass(
-                    'body', Decoder::getBody());
-                break;
-            case 'current':
-                $this->setTiming();
-                $request = $this->getClass('request');
-                $this->lockClass();
-                new Sender($request);
-                new Decoder(Sender::response(false));
-                $this->setClass(
-                    'body', Decoder::getBody()
-                );
-                break;
-            default:
-        }
+        $this->getEnv('record');
+        $this->caseType($objectId);
+        $this->handle($action);
     }
 
     private function checkAction($action) {
@@ -74,19 +38,74 @@ class Replay extends Worker
         );
     }
 
-    private function checkObjectId($object_id) {
-        \is_string($object_id) 
-        ?: new HttpException(
-            self::error['object_id'], -500
-        );
+    private function caseType($objectId) {
+        switch ($this->saveType) {
+            case 'leancloud':
+                $this->switchType();
+                $this->initialize();
+                $this->fetch($objectId);
+                break;
+        }
     }
 
-    private function getObject($object_id) {
-        Client::initialize($this->app_id, 
-            $this->app_key, $this->master_key);
-        Client::setServerUrl($this->server);
-        $fetch = (new Query($this->class))->get($object_id);
-        $this->setClass('request', $fetch->get('request'));
-        $this->setClass('response', $fetch->get('response'));
+    private function switchType() {
+        $type = $this->saveInfo[$this->saveType];
+        \is_array($type) ?: $type = [];
+        foreach ($type as $key => $value) {
+            $this->$key = $value;
+        }
+    }
+
+    private function initialize() {
+        switch($this->saveType) {
+            case 'leancloud':
+                Client::initialize($this->appId,
+                    $this->appKey, $this->masterKey);
+                Client::setServerUrl($this->endPoint);
+                break;
+        }
+    }
+
+    private function fetch($objectId) {
+        switch ($this->saveType) {
+            case 'leancloud':
+                $query = new Query($this->className);
+                $fetch = $query->get($objectId);
+                $this->setClass('request',
+                    $fetch->get('request'));
+                $this->setClass('response',
+                    $fetch->get('response'));
+                break;
+        }
+    }
+
+    private function lockClass() {
+        self::$lock = self::$class;
+        self::$class = [];
+    }
+
+    /**
+     * @param $action
+     * @throws \ErrorException
+     */
+    private function handle($action) {
+        switch ($action) {
+            case 'history':
+                $this->setTiming();
+                new Decoder($this->getClass(
+                    'response'));
+                $this->setClass('body',
+                    Decoder::getBody());
+                break;
+            case 'current':
+                $this->setTiming();
+                $this->lockClass();
+                new Sender($this->getClass('request'));
+                new Decoder(Sender::response(false));
+                $this->setClass('body',
+                    Decoder::getBody());
+                break;
+            default:
+        }
     }
 }
