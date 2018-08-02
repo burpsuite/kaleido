@@ -14,13 +14,13 @@ class HttpException extends \RuntimeException
         try {
             throw new \RuntimeException(null);
         } catch (\RuntimeException $exception) {
-            getenv(strtoupper('burpsuite_debug'))
+            getenv(strtoupper('debug'))
              ? error_log("[debug] [kaleido_exception] info:[{$message}] code:[{$code}]") : null;
             exit(json_encode([
                 'message' => $message,
                 'code' => $code,
-                'stack' => getenv(strtoupper('burpsuite_debug'))
-                    ? (array) $exception : null
+                'stack' => getenv(strtoupper('debug'))
+                    ? $exception : null
             ]));
         }
     }

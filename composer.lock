@@ -4,28 +4,30 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9a27c55b273780f1de9da24282e2d39b",
+    "content-hash": "9fe935a5fafdc04f34bd30e8e76c7b79",
     "packages": [
         {
             "name": "leancloud/leancloud-sdk",
-            "version": "v0.7.0",
+            "version": "v0.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/leancloud/php-sdk.git",
-                "reference": "a07b2a0e7355e50cef3a150921ebcc4453c63a3a"
+                "reference": "14880aacd7b621a4bbd20bed7d0890be78dd570b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/leancloud/php-sdk/zipball/a07b2a0e7355e50cef3a150921ebcc4453c63a3a",
-                "reference": "a07b2a0e7355e50cef3a150921ebcc4453c63a3a",
+                "url": "https://api.github.com/repos/leancloud/php-sdk/zipball/14880aacd7b621a4bbd20bed7d0890be78dd570b",
+                "reference": "14880aacd7b621a4bbd20bed7d0890be78dd570b",
                 "shasum": ""
             },
             "require": {
-                "ext-curl": "*"
+                "ext-curl": "*",
+                "php": ">=5.6"
             },
             "require-dev": {
                 "apigen/apigen": "^4.1",
-                "phpunit/phpunit": "^4.8"
+                "doctrine/instantiator": "<1.1.0",
+                "phpunit/phpunit": "^5.7"
             },
             "type": "library",
             "autoload": {
@@ -45,7 +47,7 @@
             "keywords": [
                 "leancloud"
             ],
-            "time": "2018-03-19T08:25:25+00:00"
+            "time": "2018-06-21T06:22:29+00:00"
         },
         {
             "name": "php-curl-class/php-curl-class",
