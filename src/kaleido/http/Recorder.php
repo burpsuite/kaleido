@@ -4,7 +4,7 @@ namespace Kaleido\Http;
 
 use LeanCloud\Client;
 use LeanCloud\CloudException;
-use LeanCloud\Object;
+use LeanCloud\LeanObject;
 
 class Recorder extends Worker
 {
@@ -70,7 +70,7 @@ class Recorder extends Worker
     private function saveRecord($request, $response) {
         switch ($this->saveType) {
             case 'leancloud':
-                $object = new Object($this->className);
+                $object = new LeanObject($this->className);
                 $object->set('request', $request);
                 $object->set('response', $response);
                 $object->save();
@@ -79,7 +79,7 @@ class Recorder extends Worker
         }
     }
 
-    private function setObjectId($response, Object $class) {
+    private function setObjectId($response, LeanObject $class) {
         if (\is_string($class->get('objectId'))) {
             \is_array($response) ?: $response = [];
             $header = $response['handle']['enable_header'];
