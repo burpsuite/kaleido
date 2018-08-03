@@ -79,6 +79,7 @@ class Encoder extends Worker
     }
 
     private function setMethod() {
+        exit(print_r($_SERVER));
         $this->setClass(
             'method', $this->method = strtolower(
                 $_SERVER['REQUEST_METHOD']));
@@ -88,12 +89,10 @@ class Encoder extends Worker
     private function setUrlParam() {
         switch ($this->method) {
             case 'get' && $this->handle['fix_urlencode']:
-                exit('5');
                 $this->setClass('url', $this->getClass('url') .
                     $_SERVER['QUERY_STRING']);
                 break;
             case 'get':
-                exit('4');
                 $this->setClass('params', $_GET);
                 $this->setReplace($this->handle['url_param'],
                     $_GET, 'params');
@@ -101,20 +100,16 @@ class Encoder extends Worker
             case \in_array($this->method, $this->allow, true) && \count($_POST):
                 $this->combineUrlParam();
                 $this->setClass('params', $_POST);
-                exit(var_dump($this->getClass('params')));
                 $this->setReplace($this->handle['form_param'],
                     $_POST, 'params');
                 break;
             case \in_array($this->method, $this->allow, true) && !\count($_POST):
-                exit('123');
                 $this->combineUrlParam();
                 $this->setReplace($this->handle['body'],
                     file_get_contents('php://input'), 'params');
                 $this->patchBody();
                 break;
             default:
-                exit(json_encode([$_POST, $this->method]));
-                break;
         }
         return $this;
     }
