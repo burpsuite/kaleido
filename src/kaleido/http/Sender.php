@@ -124,12 +124,11 @@ class Sender extends Worker
 
     private function checkMaxSize() {
         \is_int($this->maxSize)
-            ?: $this->maxSize = 0;
+            ?: $this->maxSize = 2097152;
     }
 
-    private function isGzip($encode) :bool {
-        \is_array($encode) ?: $encode = [];
-        return $encode['Content-Encoding']
+    private function isGzip(CaseInsensitiveArray $header) :bool {
+        return $header['Content-Encoding']
             !== 'gzip' ? 0 : true;
     }
 
