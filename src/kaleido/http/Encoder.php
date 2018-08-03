@@ -99,6 +99,11 @@ class Encoder extends Worker
                 break;
             case \in_array($this->method,
                     $this->allow, true) && \count($_POST) > 1:
+                exit(json_encode([
+                    'post' => $_POST,
+                    'count' => \count($_POST),
+                    'input' => file_get_contents('php://input')
+                ]));
                 $this->combineUrlParam();
                 $this->setClass('params', $_POST);
                 $this->setReplace($this->handle['form_param'],
