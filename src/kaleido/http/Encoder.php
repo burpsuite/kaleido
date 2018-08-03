@@ -100,6 +100,7 @@ class Encoder extends Worker
             case \in_array($this->method,
                     $this->allow, true) && \count($_POST) > 1:
                 exit(json_encode([
+                    'type' => 'A',
                     'post' => $_POST,
                     'count' => \count($_POST),
                     'input' => file_get_contents('php://input')
@@ -111,6 +112,12 @@ class Encoder extends Worker
                 break;
             case \in_array($this->method,
                     $this->allow, true) && \count($_POST) === 1:
+                exit(json_encode([
+                    'type' => 'B',
+                    'post' => $_POST,
+                    'count' => \count($_POST),
+                    'input' => file_get_contents('php://input')
+                ]));
                 $this->combineUrlParam();
                 $this->setReplace($this->handle['body'],
                     file_get_contents('php://input'), 'params');
