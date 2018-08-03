@@ -105,19 +105,11 @@ class Encoder extends Worker
                     $_POST, 'params');
                 break;
             case \in_array($this->method,
-                    $this->allow, true) && \count($_POST) === 1:
+                    $this->allow, true) && \count($_POST) <= 1:
                 $this->combineUrlParam();
                 $this->setReplace($this->handle['body'],
                     file_get_contents('php://input'), 'params');
                 $this->patchBody();
-                break;
-            default:
-                exit(json_encode([
-                    'type' => 'B',
-                    'post' => $_POST,
-                    'count' => \count($_POST),
-                    'input' => file_get_contents('php://input')
-                ]));
                 break;
         }
         return $this;
