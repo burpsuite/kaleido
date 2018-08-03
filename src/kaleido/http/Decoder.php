@@ -42,7 +42,7 @@ class Decoder extends Worker
     private function checkError() {
         if ($this->error && \is_int($this->errorCode)) {
             new HttpException(
-                self::error['abnormal'], $this->errorCode
+                self::getError('abnormal'), $this->errorCode
             );
         }
     }

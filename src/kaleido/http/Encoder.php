@@ -13,6 +13,7 @@ class Encoder extends Worker
      * Encoder constructor.
      * @param $taskId
      * @param $url
+     * @throws \ErrorException
      */
     public function __construct($taskId, $url) {
         parent::setTiming();
@@ -51,7 +52,7 @@ class Encoder extends Worker
             \is_string($this->host) ? $this->host = [$this->host] : false;
             if (!\in_array($host, $this->host, true)) {
                 new HttpException(
-                    self::error['request_host'], -400
+                    self::getError('request_host'), -400
                 );
             }
         }
@@ -64,7 +65,7 @@ class Encoder extends Worker
             \is_string($this->method) ? $this->method = [$this->method] : false;
             if (!\in_array($method, $this->method, true)) {
                 new HttpException(
-                    self::error['request_method'], -400
+                    self::getError('request_method'), -400
                 );
             }
         }

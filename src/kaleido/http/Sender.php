@@ -84,10 +84,10 @@ class Sender extends Worker
 
     private function checkUrl() {
         \is_string($this->url) ?: new HttpException(
-                self::error['non_string'], -500);
+                self::getError('non_string'), -500);
         if (!preg_match('/https?\:\/\//', $this->url)) {
             new HttpException(
-                self::error['payload_host'], -400
+                self::getError('payload_host'), -400
             );
         }
         return $this;
@@ -95,10 +95,10 @@ class Sender extends Worker
 
     private function checkMethod() {
         \is_string($this->method) ?: new HttpException(
-            self::error['payload_method'], -500);
+            self::getError('payload_method'), -500);
         if (!\in_array($this->method, $this->allow, true)) {
             new HttpException(
-                self::error['unsupport_type'], -400
+                self::getError('unsupport_type'), -400
             );
         }
         return $this;

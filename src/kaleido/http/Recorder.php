@@ -37,7 +37,7 @@ class Recorder extends Worker
                     $this->saveRecord($request, $response);
                 } catch (CloudException $exception) {
                     new HttpException(
-                        self::error['save_exception'], -500
+                        self::getError('save_exception'), -500
                     );
                 }
                 break;

@@ -59,7 +59,6 @@ class Loader extends Worker
      * @param $url
      * @return mixed|string
      * @throws \ErrorException
-     * @throws \LeanCloud\CloudException
      */
     public function listenHttp($taskId, $url) {
         new Encoder($taskId, $url);
@@ -147,7 +146,7 @@ class Loader extends Worker
     private function isJson($data) {
         if (!\is_object(json_decode($data))) {
             new HttpException(
-                self::error['non_json'], -500
+                self::getError('non_json'), -500
             );
         }
     }

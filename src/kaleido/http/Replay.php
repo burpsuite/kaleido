@@ -34,7 +34,7 @@ class Replay extends Worker
     private function checkAction($action) {
         \in_array($action, $this->action, true)
          ?: new HttpException(
-            self::error['request_action'], -500
+            self::getError('request_action'), -500
         );
     }
 
