@@ -89,24 +89,16 @@ class Encoder extends Worker
         switch ($this->method) {
             case $this->method === 'get' &&
                     $this->handle['fix_urlencode']:
-                exit('0x1');
                 $this->setClass('url', $this->getClass('url') .
                     $_SERVER['QUERY_STRING']);
                 break;
             case $this->method === 'get':
-                exit('0x2');
                 $this->setClass('params', $_GET);
                 $this->setReplace($this->handle['url_param'],
                     $_GET, 'params');
                 break;
             case \in_array($this->method,
                     $this->allow, true) && \count($_POST) > 1:
-                exit(json_encode([
-                    'type' => 'A',
-                    'post' => $_POST,
-                    'count' => \count($_POST),
-                    'input' => file_get_contents('php://input')
-                ]));
                 $this->combineUrlParam();
                 $this->setClass('params', $_POST);
                 $this->setReplace($this->handle['form_param'],
@@ -114,19 +106,18 @@ class Encoder extends Worker
                 break;
             case \in_array($this->method,
                     $this->allow, true) && \count($_POST) === 1:
-                exit(json_encode([
-                    'type' => 'B',
-                    'post' => $_POST,
-                    'count' => \count($_POST),
-                    'input' => file_get_contents('php://input')
-                ]));
                 $this->combineUrlParam();
                 $this->setReplace($this->handle['body'],
                     file_get_contents('php://input'), 'params');
                 $this->patchBody();
                 break;
             default:
-                exit('0x3');
+                exit(json_encode([
+                    'type' => 'B',
+                    'post' => $_POST,
+                    'count' => \count($_POST),
+                    'input' => file_get_contents('php://input')
+                ]));
                 break;
         }
         return $this;
