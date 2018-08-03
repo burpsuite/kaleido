@@ -133,7 +133,7 @@ class Sender extends Worker
             !== 'gzip' ? 0 : true;
     }
 
-    private function setBody(Curl $body, Curl $header) {
+    private function setBody($body, Curl $header) {
         switch ($body) {
             case \is_object($body):
                 $this->setClass('respType', 'text');
