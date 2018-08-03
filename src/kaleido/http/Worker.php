@@ -4,11 +4,13 @@ namespace Kaleido\Http;
 
 class Worker
 {
+    const errorPath = '../../../doc/error.json';
     public static $timing = [];
     public static $class = [];
-    public $taskId;
-    public $route = [];
+    public static $errorInfo;
     public $handle = [];
+    public $route = [];
+    public $taskId;
     const error = [
         'abnormal' => 'target server status is abnormal.',
         'request_host' => 'request_host and kaleido do not match.',
@@ -65,11 +67,11 @@ class Worker
         }
     }
 
-    protected function setReplace($rep_array, $subject, $saveName) {
-        \count($rep_array) 
+    protected function setReplace($replace, $subject, $saveName) {
+        \count($replace) 
             ?: $this->setClass($saveName, $subject);
-        foreach ($rep_array as $key => $value) {
-            switch ($rep_array) {
+        foreach ($replace as $key => $value) {
+            switch ($replace) {
                 case \is_array($subject):
                     self::$class[$saveName][$key] = $value;
                     if (!$value) {
@@ -123,5 +125,17 @@ class Worker
         $this->handle[$action] ? 
             $this->handle = $this->handle[$action] : false;
         return $this;
+    }
+
+    protected static function getError($errorId = null) {
+        if(file_exists(self::errorPath)) {
+            $errorInfo = json_encode(
+                file_get_contents(self::errorPath), true);
+            \is_array($errorInfo) 
+                ? self::$errorInfo = $errorInfo[$errorId]
+                    : self::$errorInfo = null;
+            return self::$errorInfo;
+        }
+        return self::$errorInfo;
     }
 }

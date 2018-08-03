@@ -8,7 +8,6 @@ use LeanCloud\LeanObject;
 
 class Recorder extends Worker
 {
-    public $saveLimit = 2097152;
     public $masterKey;
     public $saveType;
     public $saveInfo;
@@ -84,8 +83,7 @@ class Recorder extends Worker
         if (\is_string($class->get('objectId'))) {
             \is_array($response) ?: $response = [];
             $header = $response['handle']['enable_header'];
-            $header ? header(
-                "X-RecId: {$class->get('objectId')}") : null;
+            !$header ?: header("X-RecId: {$class->get('objectId')}");
         }
     }
 }

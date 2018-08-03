@@ -8,6 +8,7 @@ use Curl\CaseInsensitiveArray;
 class Sender extends Worker
 {
     private static $lock;
+    public $maxSize = 2097152;
     public $allow = ['get', 'post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
     public $url;
     public $method;
@@ -27,9 +28,7 @@ class Sender extends Worker
         $this->lockClass();
     }
 
-    public function unPayload($payload) {
-        \is_array($payload) ?: new HttpException(
-            self::error['non_array'], -500);
+    public function unPayload(array $payload) {
         foreach ($payload as $key => $value) {
             $this->$key = $value;
         }
@@ -38,7 +37,7 @@ class Sender extends Worker
     public function check() {
         $this->checkUrl()->checkMethod()
         ->checkParams()->checkCookies()
-        ->checkHeaders();
+        ->checkHeaders()->checkMaxSize();
     }
 
     /**
@@ -46,11 +45,12 @@ class Sender extends Worker
      */
     public function handle() {
         $curl = new Curl();
+        $this->setTaskId();
+        $curl->setMaxFilesize($this->maxSize);
         $curl->setHeaders($this->headers);
         $curl->setCookies($this->cookies);
         $curl->{$this->method}($this->url, $this->params);
         $this->setError($curl->error, $curl->errorCode);
-        $this->setTaskId();
         if (!$curl->error) {
             $this->setBody($curl->response,
                 $curl->responseHeaders);
@@ -60,7 +60,7 @@ class Sender extends Worker
     }
 
     private function lockClass() {
-        self::$lock = self::$class;
+        self::$lock =& self::$class;
         self::$class = [];
     }
 
@@ -111,15 +111,20 @@ class Sender extends Worker
     }
 
     private function checkCookies() {
-        $this->cookies
+        \is_array($this->cookies)
             ?: $this->cookies = [];
             return $this;
     }
 
     private function checkHeaders() {
-        $this->headers 
+        \is_array($this->headers) 
             ?: $this->headers = [];
             return $this;
+    }
+
+    private function checkMaxSize() {
+        \is_int($this->maxSize)
+            ?: $this->maxSize = 0;
     }
 
     private function isGzip($encode) :bool {
@@ -128,21 +133,21 @@ class Sender extends Worker
             !== 'gzip' ? 0 : true;
     }
 
-    private function setBody(Curl $respBody, Curl $respHeader) {
-        switch ($respBody) {
-            case \is_object($respBody):
+    private function setBody(Curl $body, Curl $header) {
+        switch ($body) {
+            case \is_object($body):
                 $this->setClass('respType', 'text');
                 $this->setClass('body', 
-                    json_encode($respBody));
+                    json_encode($body));
                 break;
-            case $this->isGzip($respHeader):
+            case $this->isGzip($header):
                 $this->setClass('respType', 'gzip');
                 $this->setClass('body', 
-                    base64_encode($respBody));
+                    base64_encode($body));
                 break;
             default:
                 $this->setClass('respType', 'text');
-                $this->setClass('body', $respBody);
+                $this->setClass('body', $body);
                 break;
         }
     }
