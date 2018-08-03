@@ -127,13 +127,13 @@ class Sender extends Worker
             ?: $this->maxSize = 2097152;
     }
 
-    private function isGzip(CaseInsensitiveArray $header) :bool {
+    private function isGzip($header) :bool {
+        exit(var_dump($header['Content-Encoding']));
         return $header['Content-Encoding']
             !== 'gzip' ? 0 : true;
     }
 
     private function setBody($body, CaseInsensitiveArray $header) {
-        exit(var_dump($body));
         switch ($body) {
             case \is_object($body):
                 $this->setClass('respType', 'text');
