@@ -105,7 +105,7 @@ class Encoder extends Worker
                     $_POST, 'params');
                 break;
             case \in_array($this->method,
-                    $this->allow, true) && \count($_POST) <= 1:
+                    $this->allow, true) && !\count($_POST):
                 $this->combineUrlParam();
                 $this->setReplace($this->handle['body'],
                     file_get_contents('php://input'), 'params');
