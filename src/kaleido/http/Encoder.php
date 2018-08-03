@@ -79,7 +79,6 @@ class Encoder extends Worker
     }
 
     private function setMethod() {
-        exit(print_r($_SERVER));
         $this->setClass(
             'method', $this->method = strtolower(
                 $_SERVER['REQUEST_METHOD']));
@@ -89,6 +88,7 @@ class Encoder extends Worker
     private function setUrlParam() {
         switch ($this->method) {
             case 'get' && $this->handle['fix_urlencode']:
+                exit(json_encode(['A'=>$_SERVER, 'B'=>$this->method]));
                 $this->setClass('url', $this->getClass('url') .
                     $_SERVER['QUERY_STRING']);
                 break;
