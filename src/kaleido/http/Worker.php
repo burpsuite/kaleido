@@ -110,6 +110,7 @@ class Worker
     }
 
     protected static function getError($errorId = null) {
+        var_dump(file_exists(self::errorPath));
         if(file_exists(self::errorPath)) {
             $errorInfo = json_encode(
                 file_get_contents(self::errorPath), true);
