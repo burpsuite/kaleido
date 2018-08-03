@@ -87,12 +87,11 @@ class Encoder extends Worker
 
     private function setUrlParam() {
         switch ($this->method) {
-            case 'get' && $this->handle['fix_urlencode']:
-                exit(json_encode(['A'=>$_SERVER, 'B'=>$this->method]));
+            case $this->method === 'get' && $this->handle['fix_urlencode']:
                 $this->setClass('url', $this->getClass('url') .
                     $_SERVER['QUERY_STRING']);
                 break;
-            case 'get':
+            case $this->method === 'get':
                 $this->setClass('params', $_GET);
                 $this->setReplace($this->handle['url_param'],
                     $_GET, 'params');
