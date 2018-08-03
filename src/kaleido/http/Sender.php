@@ -133,17 +133,15 @@ class Sender extends Worker
             !== 'gzip' ? 0 : true;
     }
 
-    private function setBody($body, Curl $header) {
+    private function setBody($body, CaseInsensitiveArray $header) {
         switch ($body) {
             case \is_object($body):
                 $this->setClass('respType', 'text');
-                $this->setClass('body', 
-                    json_encode($body));
+                $this->setClass('body', json_encode($body));
                 break;
             case $this->isGzip($header):
                 $this->setClass('respType', 'gzip');
-                $this->setClass('body', 
-                    base64_encode($body));
+                $this->setClass('body', base64_encode($body));
                 break;
             default:
                 $this->setClass('respType', 'text');
