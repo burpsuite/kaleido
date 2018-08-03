@@ -81,39 +81,33 @@ class Encoder extends Worker
     private function setMethod() {
         $this->setClass(
             'method', $this->method = strtolower(
-                $_SERVER['REQUEST_METHOD']
-            )
-        );
+                $_SERVER['REQUEST_METHOD']));
         return $this;
     }
 
     private function setUrlParam() {
         switch ($this->method) {
             case 'get' && $this->handle['fix_urlencode']:
-                $this->setClass(
-                    'url', $this->getClass(
-                        'url').$_SERVER['QUERY_STRING']
-                );
+                $this->setClass('url', $this->getClass('url') .
+                    $_SERVER['QUERY_STRING']);
                 break;
             case 'get':
                 $this->setClass('params', $_GET);
-                $this->setReplace(
-                    $this->handle['url_param'], $_GET, 'params'
-                );
+                $this->setReplace($this->handle['url_param'],
+                    $_GET, 'params');
                 break;
             case \in_array($this->method, $this->allow, true) && \count($_POST):
                 $this->combineUrlParam();
                 $this->setClass('params', $_POST);
-                $this->setReplace(
-                    $this->handle['form_param'], $_POST, 'params'
-                );
+                exit(var_dump($this->getClass('params')));
+                $this->setReplace($this->handle['form_param'],
+                    $_POST, 'params');
                 break;
             case \in_array($this->method, $this->allow, true) && !\count($_POST):
+                exit('123');
                 $this->combineUrlParam();
-                $this->setReplace(
-                    $this->handle['body'], 
-                    file_get_contents('php://input'), 'params'
-                );
+                $this->setReplace($this->handle['body'],
+                    file_get_contents('php://input'), 'params');
                 $this->patchBody();
                 break;
             default:
