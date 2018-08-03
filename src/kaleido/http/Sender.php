@@ -51,6 +51,7 @@ class Sender extends Worker
         $curl->setCookies($this->cookies);
         $curl->{$this->method}($this->url, $this->params);
         $this->setError($curl->error, $curl->errorCode);
+        exit(print_r($curl));
         if (!$curl->error) {
             $this->setBody($curl->response,
                 $curl->responseHeaders);
@@ -60,7 +61,7 @@ class Sender extends Worker
     }
 
     private function lockClass() {
-        self::$lock =& self::$class;
+        self::$lock = self::$class;
         self::$class = [];
     }
 
@@ -128,7 +129,6 @@ class Sender extends Worker
     }
 
     private function isGzip($header) :bool {
-        exit(var_dump($header['Content-Encoding']));
         return $header['Content-Encoding']
             !== 'gzip' ? 0 : true;
     }
