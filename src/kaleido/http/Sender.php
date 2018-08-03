@@ -85,6 +85,7 @@ class Sender extends Worker
     private function checkUrl() {
         \is_string($this->url) ?: new HttpException(
                 self::getError('non_string'), -500);
+        exit(print_r($this));
         if (!preg_match('/https?\:\/\//', $this->url)) {
             new HttpException(
                 self::getError('payload_host'), -400
