@@ -89,10 +89,12 @@ class Encoder extends Worker
         switch ($this->method) {
             case $this->method === 'get' &&
                     $this->handle['fix_urlencode']:
+                exit('0x1');
                 $this->setClass('url', $this->getClass('url') .
                     $_SERVER['QUERY_STRING']);
                 break;
             case $this->method === 'get':
+                exit('0x2');
                 $this->setClass('params', $_GET);
                 $this->setReplace($this->handle['url_param'],
                     $_GET, 'params');
@@ -124,6 +126,8 @@ class Encoder extends Worker
                 $this->patchBody();
                 break;
             default:
+                exit('0x3');
+                break;
         }
         return $this;
     }
