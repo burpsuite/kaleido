@@ -155,6 +155,7 @@ class Encoder extends Worker
 
     private function setHeader() {
         if ($this->handle['enable_header']) {
+            exit(Utility::getHeaders());
             $this->setClass('headers', Utility::getHeaders());
             $this->setReplace($this->handle['header'], 
                 Utility::getHeaders(), 'headers');
