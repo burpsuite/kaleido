@@ -4,6 +4,8 @@ namespace Kaleido\Http;
 
 class Utility
 {
+    public static $errorHeader = ['Host'];
+    public static $lostHeader = ['Content-Type'];
 
     /**
      * Utility::millitime Get microseconds.
@@ -39,10 +41,28 @@ class Utility
      */
     public static function getHeaders() :array {
         $headers = [];
-        foreach ((array)$_SERVER as $name => $value) {
-            if (0 === strpos($name, 'HTTP_')) {
-                $headers[str_replace(' ', '-',
-                    ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+        foreach ($_SERVER as $name => $value) {
+            if (!\in_array($name, self::$errorHeader, true)
+                && 0 === strpos($name, 'HTTP_')) {
+                $headers[str_replace(' ', '-', ucwords(
+                    strtolower(str_replace(
+                '_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+        $headers = self::addLostHeader($headers);
+        return $headers;
+    }
+
+    /**
+     * Utility::addLostHeader Fix Lost headers.
+     * @param array $headers
+     * @return array
+     */
+    public static function addLostHeader(array $headers) :array {
+        foreach (self::$lostHeader as $key => $value) {
+            if (!$headers[self::$lostHeader[$key]]) {
+                $headers[self::$lostHeader[$key]]
+                    = $_SERVER[self::$lostHeader[$key]];
             }
         }
         return $headers;
