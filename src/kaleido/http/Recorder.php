@@ -70,6 +70,7 @@ class Recorder extends Worker
     private function saveRecord($request, $response) {
         switch ($this->saveType) {
             case 'leancloud':
+                exit(var_dump([$request, $response]));
                 $object = new LeanObject($this->className);
                 $object->set('request', $request);
                 $object->set('response', $response);
