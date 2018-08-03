@@ -25,12 +25,12 @@ class Encoder extends Worker
     }
 
     private function check($url) {
+        $this->switchHandle('request');
         $this->checkHost($url)
         ->checkMethod();
     }
 
     private function handle($taskId, $url) {
-        $this->switchHandle('request');
         $this->setTaskId($taskId)->setMethod()
         ->setUrl($url)->setUrlParam()->setUrl($url)
         ->setCookie()->setHeader();
@@ -47,7 +47,6 @@ class Encoder extends Worker
     }
 
     private function checkHost($url) {
-        var_dump($this->handle);
         if ($this->handle['check_hostname']) {
             $host = preg_replace('/^(https?\:\/\/.*?\..*?)\/.*/', '$1', $url);
             \is_string($this->host) ? $this->host = [$this->host] : false;
