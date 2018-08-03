@@ -133,6 +133,7 @@ class Sender extends Worker
     }
 
     private function setBody($body, CaseInsensitiveArray $header) {
+        exit(var_dump($body));
         switch ($body) {
             case \is_object($body):
                 $this->setClass('respType', 'text');
