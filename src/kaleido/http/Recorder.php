@@ -33,6 +33,7 @@ class Recorder extends Worker
             case 'leancloud':
                 $this->switchType();
                 $this->initialize();
+                $this->saveRecord($request, $response);
                 try {
                     $this->saveRecord($request, $response);
                 } catch (CloudException $exception) {

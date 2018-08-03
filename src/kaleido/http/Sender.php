@@ -51,7 +51,6 @@ class Sender extends Worker
         $curl->setCookies($this->cookies);
         $curl->{$this->method}($this->url, $this->params);
         $this->setError($curl->error, $curl->errorCode);
-        exit(print_r($curl));
         if (!$curl->error) {
             $this->setBody($curl->response,
                 $curl->responseHeaders);
