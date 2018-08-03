@@ -4,10 +4,8 @@ namespace Kaleido\Http;
 
 class Worker
 {
-    const errorPath = '../../../error.json';
     public static $timing = [];
     public static $class = [];
-    public static $errorInfo;
     public $handle = [];
     public $route = [];
     public $taskId;
@@ -109,16 +107,27 @@ class Worker
         return $this;
     }
 
+    protected static function errorInfo() :array {
+        return [
+            'abnormal'=> 'target server status is abnormal.',
+            'request_host'=> 'request_host and kaleido do not match.',
+            'request_method'=> 'request_method and kaleido do not match',
+            'request_action'=> 'request_action and kaleido do not match',
+            'non_array'=> 'payload is a non-array type.',
+            'non_string'=> 'payload_url is a non-string type.',
+            'payload_host'=> 'payload_host is a invalid protocol.',
+            'payload_method'=> 'payload_method is a non-string type.',
+            'unsupport_type'=> 'payload_method is an unsupported type.',
+            'object_id'=> 'object_id is a non-string type.',
+            'request_control'=> 'request_control is not in kaleido=>=>control.',
+            'file_path'=> 'kaleido configuration file_path is a invalid path.',
+            'env_undefined'=> 'kaleido env_configuration is undefined.',
+            'non_json'=> 'kaleido configuration is a non-json type.',
+            'save_exception'=> 'kaleido record save exception.'
+        ];
+    }
+
     protected static function getError($errorId = null) {
-        var_dump(file_exists(self::errorPath));
-        if(file_exists(self::errorPath)) {
-            $errorInfo = json_encode(
-                file_get_contents(self::errorPath), true);
-            \is_array($errorInfo) 
-                ? self::$errorInfo = $errorInfo[$errorId]
-                    : self::$errorInfo = null;
-            return self::$errorInfo;
-        }
-        return self::$errorInfo;
+        return self::errorInfo()[$errorId] ?? null;
     }
 }
