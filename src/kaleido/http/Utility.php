@@ -5,7 +5,7 @@ namespace Kaleido\Http;
 class Utility
 {
     public static $errorHeader = ['Host'];
-    public static $lostHeader = ['Content_Type'];
+    public static $lostHeader = ['Content-Type'];
 
     /**
      * Utility::millitime Get microseconds.
@@ -62,8 +62,9 @@ class Utility
         foreach (self::$lostHeader as $key => $value) {
             if (!$headers[self::$lostHeader[$key]]) {
                 $headers[self::$lostHeader[$key]]
-                    = strtoupper($_SERVER[
-                        self::$lostHeader[$key]]);
+                    = strtoupper(str_replace('-',
+                    '_', $_SERVER[self::$lostHeader[$key]])
+                );
             }
         }
         return $headers;
