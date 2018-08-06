@@ -59,10 +59,11 @@ class Utility
      * @return array
      */
     public static function addLostHeader(array $headers) :array {
+        exit(print_r($_SERVER));
         foreach (self::$lostHeader as $key => $value) {
             if (!$headers[self::$lostHeader[$key]]) {
                 $headers[self::$lostHeader[$key]]
-                    = $_SERVER[self::$lostHeader[$key]];
+                    = $_SERVER[self::$lostHeader[$value]];
             }
         }
         return $headers;
