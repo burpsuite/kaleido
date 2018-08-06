@@ -20,8 +20,11 @@ class Recorder extends Worker
      * Recorder constructor.
      * @param array $request
      * @param array $response
+     * @throws \ErrorException
      */
     public function __construct(array $request, array $response) {
+        parent::load();
+        parent::switchHandle('response');
         $this->setTiming('RecTiming');
         $this->getEnv('record');
         $this->caseType($request, $response);
@@ -80,13 +83,10 @@ class Recorder extends Worker
     }
 
     private function setObjectId($response, LeanObject $class) {
-
-        exit(print_r($response));
-
         if (\is_string($class->get('objectId'))) {
             \is_array($response) ?: $response = [];
-            $header = $response['enable_header'];
-            !$header ?: header("X-RecId: {$class->get('objectId')}");
+            !$this->handle['enable_header']
+                ?: header("X-RecId: {$class->get('objectId')}");
         }
     }
 }
