@@ -61,6 +61,17 @@ class Utility
     public static function addLostHeader(array $headers) :array {
         foreach (self::$lostHeader as $key => $value) {
             if (!$headers[self::$lostHeader[$key]]) {
+
+
+                //debug...
+                exit(json_encode([
+                    'env' => $_SERVER,
+                    'lost' => $headers[self::$lostHeader[$key]],
+                    'upper'=> strtoupper(str_replace('-',
+                        '_', $_SERVER[self::$lostHeader[$key]]))
+                ]));
+
+
                 $headers[self::$lostHeader[$key]]
                     = strtoupper(str_replace('-',
                     '_', $_SERVER[self::$lostHeader[$key]])
