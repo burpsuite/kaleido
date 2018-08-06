@@ -25,6 +25,9 @@ class Recorder extends Worker
     public function __construct(array $request, array $response) {
         parent::load();
         parent::switchHandle('response');
+
+        exit(print_r($this));
+
         $this->setTiming('RecTiming');
         $this->getEnv('record');
         $this->caseType($request, $response);
