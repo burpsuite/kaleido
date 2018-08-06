@@ -82,7 +82,7 @@ class Recorder extends Worker
     private function setObjectId($response, LeanObject $class) {
         if (\is_string($class->get('objectId'))) {
             \is_array($response) ?: $response = [];
-            $header = $response['handle']['enable_header'];
+            $header = $response['enable_header'];
             !$header ?: header("X-RecId: {$class->get('objectId')}");
         }
     }
