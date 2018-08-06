@@ -17,8 +17,7 @@ class Worker
     protected function load() {
         (new Loader())->_load();
         return $this->route = json_decode(
-            Loader::fetch(), true
-        );
+            Loader::fetch(), true);
     }
 
     /**
@@ -27,7 +26,7 @@ class Worker
     protected function matchTaskId($taskId = false) {
         $taskId ?: $taskId = $this->taskId;
         if (array_key_exists($taskId, $this->route)) {
-            foreach ((array)$this->route[$taskId] as $key => $value) {
+            foreach ($this->route[$taskId] as $key => $value) {
                 $this->$key = $value;
             }
         }
@@ -69,11 +68,6 @@ class Worker
                     break;
             }
         }
-    }
-
-    protected static function getBody() {
-        return \is_string(self::$class['body'])
-            ? self::$class['body'] : 'error_body';
     }
 
     protected function getClass($name = 'null') {

@@ -20,18 +20,20 @@ class Recorder extends Worker
      * Recorder constructor.
      * @param array $request
      * @param array $response
-     * @throws \ErrorException
      */
     public function __construct(array $request, array $response) {
-        parent::load();
-        parent::switchHandle('response');
-
-        exit(print_r($this));
-
+        $this->getHandle();
         $this->setTiming('RecTiming');
         $this->getEnv('record');
         $this->caseType($request, $response);
         $this->setTiming('RecTiming');
+    }
+
+    private function getHandle() {
+        if (Decoder::class(false)) {
+            $this->handle =
+                Decoder::class(false)['handle'];
+        }
     }
 
     private function caseType($request, $response) {

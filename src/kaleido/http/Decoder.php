@@ -4,6 +4,7 @@ namespace Kaleido\Http;
 
 class Decoder extends Worker
 {
+    private static $lock;
     public $error = false;
     public $errorCode = 0;
     public $respType;
@@ -21,6 +22,7 @@ class Decoder extends Worker
         $this->setResponse($response);
         parent::matchTaskId();
         $this->handle();
+        $this->lockClass();
     }
 
     private function setResponse($response) {
@@ -45,6 +47,21 @@ class Decoder extends Worker
                 self::getError('abnormal'), $this->errorCode
             );
         }
+    }
+
+    private function lockClass() {
+        self::$lock = self::$class;
+        self::$class = [];
+    }
+
+    public static function class($encode) {
+        return $encode ? json_encode(self::$lock)
+            : (array)self::$lock;
+    }
+
+    protected static function getBody() {
+        return \is_string(self::$lock['body'])
+            ? self::$lock['body'] : 'error_body';
     }
 
     private function setUniqueId() {
