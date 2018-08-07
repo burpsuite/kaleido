@@ -4,7 +4,7 @@ namespace Kaleido\Http;
 
 class Decoder extends Worker
 {
-    private static $handle;
+    private static $handle_list;
     private static $lock;
     public $error = false;
     public $errorCode = 0;
@@ -52,12 +52,12 @@ class Decoder extends Worker
     }
 
     public static function getHandle() {
-        return \is_array(self::$handle)
-            ? self::$handle : [];
+        return \is_array(self::$handle_list)
+            ? self::$handle_list : [];
     }
 
     private function setHandle() {
-        self::$handle = $this->handle;
+        self::$handle = $this->handle_list;
     }
 
     private function lockClass() {
