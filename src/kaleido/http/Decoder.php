@@ -4,6 +4,7 @@ namespace Kaleido\Http;
 
 class Decoder extends Worker
 {
+    private static $handle;
     private static $lock;
     public $error = false;
     public $errorCode = 0;
@@ -38,7 +39,7 @@ class Decoder extends Worker
         parent::switchHandle('response');
         $this->setHeaders()->setCookies();
         $this->setTiming()->setUniqueId()
-        ->setBody();
+        ->setBody()->setHandle();
     }
 
     private function checkError() {
@@ -48,6 +49,15 @@ class Decoder extends Worker
                 $this->errorCode
             );
         }
+    }
+
+    public static function getHandle() {
+        return \is_array(self::$handle)
+            ? self::$handle : [];
+    }
+
+    private function setHandle() {
+        self::$handle = $this->handle;
     }
 
     private function lockClass() {

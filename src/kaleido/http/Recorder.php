@@ -22,19 +22,15 @@ class Recorder extends Worker
      * @param array $response
      */
     public function __construct(array $request, array $response) {
-        $this->getHandle();
+        $this->unHandle();
         $this->setTiming('RecTiming');
         $this->getEnv('record');
         $this->caseType($request, $response);
         $this->setTiming('RecTiming');
     }
 
-    private function getHandle() {
-        exit(print_r(Decoder::class(false)));
-        if (Decoder::class(false)) {
-            $this->handle =
-                Decoder::class(false)['handle'];
-        }
+    private function unHandle() {
+        $this->handle = Decoder::getHandle();
     }
 
     private function caseType($request, $response) {
