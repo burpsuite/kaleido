@@ -30,6 +30,7 @@ class Recorder extends Worker
     }
 
     private function getHandle() {
+        exit(print_r(Decoder::class(false)));
         if (Decoder::class(false)) {
             $this->handle =
                 Decoder::class(false)['handle'];
