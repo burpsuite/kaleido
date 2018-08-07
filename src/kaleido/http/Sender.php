@@ -28,9 +28,11 @@ class Sender extends Worker
         $this->lockClass();
     }
 
-    public function unPayload(array $payload) {
-        foreach ($payload as $key => $value) {
-            $this->$key = $value;
+    public function unPayload($payload) {
+        if (\is_array($payload)) {
+            foreach ($payload as $key => $value) {
+                $this->$key = $value;
+            }
         }
     }
 

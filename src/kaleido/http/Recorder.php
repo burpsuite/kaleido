@@ -64,8 +64,9 @@ class Recorder extends Worker
         switch($this->saveType) {
             case 'leancloud':
                 Client::initialize($this->appId,
-                    $this->appKey, $this->masterKey);
-                Client::setServerUrl($this->endPoint);
+                $this->appKey, $this->masterKey);
+                Client::setServerUrl(
+                $this->endPoint);
                 break;
         }
     }
