@@ -57,7 +57,9 @@ class Decoder extends Worker
     }
 
     private function setHandle() {
-        self::$handle = $this->handle_list;
+        if (\is_array($this->handle)) {
+            self::$handle_list = $this->handle;
+        }
     }
 
     private function lockClass() {
