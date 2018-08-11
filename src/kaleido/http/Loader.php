@@ -8,6 +8,7 @@ use Predis\Client;
 class Loader extends Worker
 {
 
+    public static $lock = [];
     public $allow = ['dynamic'];
     public $loadType;
     public $loadInfo;
@@ -32,6 +33,42 @@ class Loader extends Worker
                 $this->complete();
                 break;
         }
+    }
+
+    private function lockClass() {
+        self::$lock = self::$class;
+        self::$class = [];
+    }
+
+    public static function fetch() {
+        return \is_string(self::$lock['fetch'])
+            ? self::$lock['fetch'] : 'error_fetch';
+    }
+
+    /**
+     * @param $taskId
+     * @param $url
+     * @return mixed|string
+     * @throws \ErrorException
+     */
+    public function listenHttp($taskId, $url) {
+        new Encoder($taskId, $url);
+        new Sender(Encoder::class(false));
+        new Decoder(Sender::response(false));
+        new Recorder(Encoder::class(false),
+            Sender::response(false));
+        return Decoder::getBody();
+    }
+
+    /**
+     * @param $action
+     * @param $objectId
+     * @return mixed
+     * @throws \ErrorException
+     */
+    public function replayHttp($action, $objectId) {
+        new Replay($action, $objectId);
+        return Replay::getBody();
     }
 
     private function complete() {
