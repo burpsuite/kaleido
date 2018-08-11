@@ -34,7 +34,6 @@ class Loader extends Worker
         }
     }
 
-
     private function complete() {
         if (!$this->getClass('isExist')) {
             $this->fetchLoadData();
