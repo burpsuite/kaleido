@@ -7,7 +7,6 @@ use Predis\Client;
 
 class Loader extends Worker
 {
-
     public static $lock = [];
     public $allow = ['dynamic'];
     public $loadType;
