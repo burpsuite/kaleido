@@ -17,20 +17,21 @@ class Loader extends Worker
 
     public function _load() {
         $this->getEnv('database');
+        $this->unLoadInfo();
         $this->loadType();
+        $this->lockClass();
     }
 
     public function loadType() {
         switch ($this->loadType) {
             case 'local':
-                $this->unLoadInfo();
                 $this->fetchLoadData();
                 break;
             case 'remote':
-                $this->unLoadInfo();
                 $this->isDynamicType();
                 $this->loadRedis();
                 $this->complete();
+                $this->setConsole();
                 break;
         }
     }
@@ -43,6 +44,21 @@ class Loader extends Worker
     public static function fetch() {
         return \is_string(self::$lock['fetch'])
             ? self::$lock['fetch'] : 'error_fetch';
+    }
+
+    private function isJson($data) {
+        if (!\is_object(json_decode($data))) {
+            new HttpException(
+                self::getError('non_json'), -500
+            );
+        }
+    }
+
+    private function setConsole() {
+        $this->getClass('expired')
+         ? error_log('redisExpire: ' . 
+            $this->getClass('expired'))
+             : error_log('redisExpire: 0');
     }
 
     /**
@@ -83,9 +99,9 @@ class Loader extends Worker
             $predis = new Client($this->getLoadCache('data'));
             $expire = json_encode(['expired' => time() + 
                 $this->getLoadCache('interval')]);
-            $redis->set(sha1($this->loadData), $this->getClass('fetch'));
-            $redis->set(sha1($this->loadData. 'expired'), $expire);
-            $redis->disconnect();
+            $predis->set(sha1($this->loadData), $this->getClass('fetch'));
+            $predis->set(sha1($this->loadData. 'expired'), $expire);
+            $predis->disconnect();
         }
     }
 
@@ -131,8 +147,8 @@ class Loader extends Worker
     }
 
     private function isDynamicType() {
-        if (in_array($this->getCacheType, $this->allow)) {
-            !\count($this->loadCache) ?: 
+        if (in_array($this->getCacheType(), $this->allow)) {
+            //!\count($this->loadCache) ?: 
             $this->setLoadCache('data', getenv(
                  $this->getLoadCache('data')
             ));
