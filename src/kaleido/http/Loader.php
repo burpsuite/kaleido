@@ -8,45 +8,45 @@ use Predis\Client;
 class Loader extends Worker
 {
 
-	public $allow = ['dynamic'];
-	public $loadType;
-	public $loadInfo;
-	public $loadData;
-	public $loadCache = [];
+    public $allow = ['dynamic'];
+    public $loadType;
+    public $loadInfo;
+    public $loadData;
+    public $loadCache = [];
 
-	public function _load() {
-		$this->getEnv('database');
-		$this->loadType();
-	}
+    public function _load() {
+        $this->getEnv('database');
+        $this->loadType();
+    }
 
-	public function loadType() {
-		switch ($this->loadType) {
-			case 'local':
-				$this->unLoadInfo();
-				$this->fetchLoadData();
-				break;
-			case 'remote':
-				$this->unLoadInfo();
-				$this->isDynamicType();
-				$this->loadRedis();
-				$this->complete();
-				break;
-		}
-	}
+    public function loadType() {
+        switch ($this->loadType) {
+            case 'local':
+                $this->unLoadInfo();
+                $this->fetchLoadData();
+                break;
+            case 'remote':
+                $this->unLoadInfo();
+                $this->isDynamicType();
+                $this->loadRedis();
+                $this->complete();
+                break;
+        }
+    }
 
 
-	private function complete() {
-		if (!$this->getClass('isExist')) {
-			$this->fetchLoadData();
-			$this->saveRedis();
-		}
-	}
+    private function complete() {
+        if (!$this->getClass('isExist')) {
+            $this->fetchLoadData();
+            $this->saveRedis();
+        }
+    }
 
     private function saveRedis() {
         if (!$this->getClass('expired')) {
             $predis = new Client($this->getLoadCache('data'));
             $expire = json_encode(['expired' => time() + 
-            	$this->getLoadCache('interval')]);
+                $this->getLoadCache('interval')]);
             $redis->set(sha1($this->loadData), $this->getClass('fetch'));
             $redis->set(sha1($this->loadData. 'expired'), $expire);
             $redis->disconnect();
@@ -57,18 +57,18 @@ class Loader extends Worker
      * @throws \ErrorException
      */
     private function fetchLoadData() {
-    	switch ($this->loadType) {
-    		case 'local':
-    			$this->setClass('fetch', 
-    				file_get_contents($this->loadData));
-    			$this->isJson($this->getClass('fetch'));
-    			break;
-    		case 'remote':
-    			$curl = new Curl;
-    			$curl->get($this->loadData);
-    			$this->getResponse($curl->response);
-    			break;  
-    	}
+        switch ($this->loadType) {
+            case 'local':
+                $this->setClass('fetch', 
+                    file_get_contents($this->loadData));
+                $this->isJson($this->getClass('fetch'));
+                break;
+            case 'remote':
+                $curl = new Curl;
+                $curl->get($this->loadData);
+                $this->getResponse($curl->response);
+                break;  
+        }
     }
 
     private function getResponse($response) {
@@ -84,37 +84,37 @@ class Loader extends Worker
         }
     }
 
-	private function loadRedis() {
-		if (\count($this->loadCache)) {
-			$predis = new Client(
-				$this->getLoadCache('data'));
-			$this->isExist($predis);
-			$this->isExpired($predis);
-			$predis->disconnect();
-		}
-	}
+    private function loadRedis() {
+        if (\count($this->loadCache)) {
+            $predis = new Client(
+                $this->getLoadCache('data'));
+            $this->isExist($predis);
+            $this->isExpired($predis);
+            $predis->disconnect();
+        }
+    }
 
-	private function isDynamicType() {
-		if (in_array($this->getCacheType, $this->allow)) {
-			!\count($this->loadCache) ?: 
-			$this->setLoadCache('data', getenv(
-			 	$this->getLoadCache('data')
-			));
-		}
-	}
+    private function isDynamicType() {
+        if (in_array($this->getCacheType, $this->allow)) {
+            !\count($this->loadCache) ?: 
+            $this->setLoadCache('data', getenv(
+                 $this->getLoadCache('data')
+            ));
+        }
+    }
 
     private function isExist(Client $predis) { 
-    	if ($predis->get(sha1($this->loadData))) {
-    		$this->setClass('fetch', 
-    			$predis->get(sha1($this->loadData)));
-    		$this->setClass('isExist', true);
-    	}
+        if ($predis->get(sha1($this->loadData))) {
+            $this->setClass('fetch', 
+                $predis->get(sha1($this->loadData)));
+            $this->setClass('isExist', true);
+        }
     }
 
     private function isExpired(Client $predis) { 
         if ($this->getClass('isExist')) {
             $expire = json_decode($predis->get(
-            	sha1($this->loadData.'expired')), true);
+                sha1($this->loadData.'expired')), true);
             if ($expire['expired'] - time() > 0) {
                 $this->setClass('expired',
                     $expire['expired'] - time());
@@ -122,22 +122,22 @@ class Loader extends Worker
         }
     }
 
-	private function unLoadInfo() {
-		foreach ($this->loadInfo as $key => $val) {
-			$this->$key = $val;
-		}
-	}
+    private function unLoadInfo() {
+        foreach ($this->loadInfo as $key => $val) {
+            $this->$key = $val;
+        }
+    }
 
-	private function getLoadCache($name) {
-		return $this->loadCache[$name] ?? false;
-	}
+    private function getLoadCache($name) {
+        return $this->loadCache[$name] ?? false;
+    }
 
-	private function setLoadCache($name, $value = null) {
-		!\is_string($name) && !$this->loadCache[$name]
-			?: $this->loadCache[$name] = $value;
-	}
+    private function setLoadCache($name, $value = null) {
+        !\is_string($name) && !$this->loadCache[$name]
+            ?: $this->loadCache[$name] = $value;
+    }
 
-	private function getCacheType() {
-		return $this->loadCache['type'] ?? false;
-	}
+    private function getCacheType() {
+        return $this->loadCache['type'] ?? false;
+    }
 }
