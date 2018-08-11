@@ -124,7 +124,7 @@ class Decoder extends Worker
             $this->setClass('headers', $this->headers);
             $this->setReplace($this->handle['header'], 
                 $this->headers, 'headers');
-            \count($this->getClass('headers'))
+            \is_array($this->getClass('headers'))
                 ? $data = $this->getClass('headers')
                     : $data = [];
             foreach ($data as $key => $value) {
@@ -139,7 +139,7 @@ class Decoder extends Worker
             $this->setClass('cookies', $this->cookies);
             $this->setReplace($this->handle['cookie'], 
                 $this->cookies, 'cookies');
-            \count($this->getClass('cookies'))
+            \is_array($this->getClass('cookies'))
                 ? $data = $this->getClass('cookies')
                      : $data = [];
             foreach ($data as $key => $value) {
