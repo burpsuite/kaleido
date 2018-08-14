@@ -87,10 +87,9 @@ class Loader extends Worker
     }
 
     private function complete() {
-        if (!$this->getClass('isExist')) {
-            $this->fetchLoadData();
-            $this->saveRedis();
-        }
+        $this->getClass('isExist')
+            ?: $this->fetchLoadData();
+        $this->saveRedis();
     }
 
     private function saveRedis() {
