@@ -160,10 +160,7 @@ class Sender extends Worker
     }
 
     private function setCookies($cookies) {
-        switch ($cookies) {
-            case \is_array($cookies):
-                $this->setClass('cookies', $cookies);
-                break;
-        }
+        !\is_array($cookies) ?: 
+            $this->setClass('cookies', $cookies);
     }
 }

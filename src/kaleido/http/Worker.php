@@ -15,7 +15,7 @@ class Worker
      * @throws \ErrorException
      */
     protected function load() {
-        (new Loader())->_load();
+            (new Loader())->_load();
         return $this->route = json_decode(
             Loader::fetch(), true);
     }
@@ -48,7 +48,7 @@ class Worker
     }
 
     protected function setReplace($replace, $subject, $saveName) {
-        \count($replace) 
+        \is_array($replace) && \count($replace) 
             ?: $this->setClass($saveName, $subject);
         foreach ($replace as $key => $value) {
             switch ($replace) {
@@ -63,7 +63,7 @@ class Worker
                 case \is_string($subject):
                     $this->setClass(
                         $saveName, $subject = preg_replace(
-                        "/{$key}/", $value, $subject
+                            "/{$key}/", $value, $subject
                     ));
                     break;
             }
@@ -96,8 +96,8 @@ class Worker
     }
 
     protected function switchHandle($action = 'null') {
-        $this->handle[$action] ? 
-            $this->handle = $this->handle[$action] : false;
+        !$this->handle[$action] ?: 
+            $this->handle = $this->handle[$action];
         return $this;
     }
 

@@ -56,8 +56,8 @@ class Loader extends Worker
     private function setConsole() {
         $this->getClass('expired')
          ? error_log('redisExpire: ' . 
-            $this->getClass('expired'))
-             : error_log('redisExpire: 0');
+        $this->getClass('expired'))
+         : error_log('redisExpire: 0');
     }
 
     /**
@@ -94,7 +94,7 @@ class Loader extends Worker
     }
 
     private function saveRedis() {
-        if (!$this->getClass('expired')) {
+        if ($this->getClass('expired')) {
             $predis = new Client($this->getLoadCache('data'));
             $expire = json_encode(['expired' => time() + 
                 $this->getLoadCache('interval')]);
