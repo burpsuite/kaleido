@@ -54,7 +54,7 @@ class Loader extends Worker
     }
 
     private function setConsole() {
-        $this->getClass('expired')
+        !$this->getClass('expired')
          ? error_log('redisExpire: ' . 
         $this->getClass('expired'))
          : error_log('redisExpire: 0');
@@ -87,7 +87,8 @@ class Loader extends Worker
     }
 
     private function complete() {
-        if (!$this->getClass('isExist')) {
+        if ($this->getClass('expired') 
+                || !$this->getClass('isExist')) {
             $this->fetchLoadData();
             $this->saveRedis();
         }
