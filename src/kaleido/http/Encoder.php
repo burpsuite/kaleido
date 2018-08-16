@@ -49,7 +49,7 @@ class Encoder extends Worker
     private function checkHost($url) {
         if ($this->handle['check_hostname']) {
             $host = preg_replace('/^(https?\:\/\/.*?\..*?)\/.*/', '$1', $url);
-            \is_string($this->host) ? $this->host = [$this->host] : false;
+            !\is_string($this->host) ?: $this->host = [$this->host];
             if (!\in_array($host, $this->host, true)) {
                 new HttpException(
                     self::getError('request_host'), -400
@@ -62,7 +62,7 @@ class Encoder extends Worker
     private function checkMethod() {
         if ($this->handle['check_method']) {
             $method = strtolower($_SERVER['REQUEST_METHOD']);
-            \is_string($this->method) ? $this->method = [$this->method] : false;
+            !\is_string($this->method) ?: $this->method = [$this->method];
             if (!\in_array($method, $this->method, true)) {
                 new HttpException(
                     self::getError('request_method'), -400
@@ -119,9 +119,8 @@ class Encoder extends Worker
         $this->getClass('url')
             ? $url = $this->getClass('url')
                 : $this->setClass('url', $url);
-        $this->setReplace(
-            $this->handle['url'], $url, 'url'
-        );
+        $this->setReplace($this->handle['url'], 
+                $url, 'url');
         return $this;
     }
 
@@ -140,15 +139,14 @@ class Encoder extends Worker
     }
 
     private function combineUrlParam() {
-        $url_params = null;
+        $url_params = [];
         $this->setClass('url_params', $_GET);
         $this->setReplace($this->handle['url_param'], $_GET, 'url_params');
-        $this->getClass('url_params') ?: self::$class['url_params'] = [];
-        foreach ((array)$this->getClass('url_params') as $key => $value) {
+        foreach ($this->getClass('url_params') as $key => $value) {
             $url_params .= $key.'='.$value.'&';
         }
-        strpos($this->getClass('url'), "\?") && $url_params
-            ? $this->setClass('url', $this->getClass('url').'?') : null;
+        !strpos($this->getClass('url'), "\?")
+            ?: $this->setClass('url', $this->getClass('url').'?');
         $this->setClass('url', $this->getClass('url').rtrim($url_params, '&'));
         unset(self::$class['url_params']);
     }

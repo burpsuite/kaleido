@@ -61,9 +61,9 @@ class Worker
                     }
                     break;
                 case \is_string($subject):
-                    $this->setClass(
-                        $saveName, $subject = preg_replace(
-                            "/{$key}/", $value, $subject
+                    $this->setClass($saveName, 
+                        $subject = preg_replace("/{$key}/", 
+                            $value, $subject
                     ));
                     break;
             }

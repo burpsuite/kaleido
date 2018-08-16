@@ -146,7 +146,6 @@ class Loader extends Worker
 
     private function isDynamicType() {
         if (in_array($this->getCacheType(), $this->allow)) {
-            //!\count($this->loadCache) ?: 
             $this->setLoadCache('data', getenv(
                  $this->getLoadCache('data')
             ));
