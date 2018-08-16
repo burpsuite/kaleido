@@ -84,6 +84,10 @@ class Replay extends Worker
         self::$class = [];
     }
 
+    public static function getBody() {
+        return $this->getClass('body') ?? false;
+    }
+
     /**
      * @param $action
      * @throws \ErrorException
