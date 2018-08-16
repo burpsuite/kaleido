@@ -85,7 +85,7 @@ class Replay extends Worker
     }
 
     public static function getBody() {
-        return $this->getClass('body') ?? false;
+        return self::$class['body'] ?? false;
     }
 
     /**
