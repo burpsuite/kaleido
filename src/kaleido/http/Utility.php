@@ -61,10 +61,16 @@ class Utility
     public static function addLostHeader(array $headers) :array {
         foreach (self::$lostHeader as $key => $value) {
             if (!$headers[$value]) {
+                //debug...
+                $log['status'] = 2;
+                $log['header_key'] = $headers[$value];
+                $log['header_val'] = strtoupper(str_replace('-', '_', $value));
+                $log['origin_key'] = $_SERVER;
+                $log['conten_val'] = $_SERVER[strtoupper(str_replace('-', '_', $value))];
+                exit(json_encode($log));
+
                 $headers[$value] = $_SERVER[
-                    strtoupper(
-                        str_replace('-', '_', $value))
-                ];
+                    strtoupper(str_replace('-', '_', $value))];
             }
         }
         return $headers;
