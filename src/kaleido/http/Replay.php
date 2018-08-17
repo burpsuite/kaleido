@@ -25,13 +25,13 @@ class Replay extends Worker
      * @throws \ErrorException
      */
     public function __construct($action, $objectId) {
-        $this->checkAction($action);
+        $this->checkActivity($action);
         $this->getEnv('record');
         $this->caseType($objectId);
         $this->handle($action);
     }
 
-    private function checkAction($action) {
+    private function checkActivity($action) {
         \in_array($action, $this->action, true)
          ?: new HttpException(
             self::getError('request_action'), -500
