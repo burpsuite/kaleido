@@ -101,7 +101,7 @@ class Worker
         return $this;
     }
 
-    protected static function errorInfo() :array {
+    protected static function errorItem() :array {
         return [
             'abnormal'=> 'target server status is abnormal.',
             'request_host'=> 'request_host and kaleido do not match.',
@@ -122,6 +122,6 @@ class Worker
     }
 
     protected static function getError($errorId = null) {
-        return self::errorInfo()[$errorId] ?? null;
+        return self::errorItem()[$errorId] ?? null;
     }
 }
