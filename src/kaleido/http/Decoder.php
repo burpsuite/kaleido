@@ -43,11 +43,10 @@ class Decoder extends Worker
     }
 
     private function checkError() {
-        if ($this->error && \is_int($this->errorCode)) {
-            new HttpException(
-                self::getError('abnormal'), 
-                $this->errorCode
-            );
+        if (!$this->handle['allow_error']) {
+            $this->error && \is_int($this->errorCode)
+                ? new HttpException(self::getError('abnormal'), 
+            $this->errorCode) : false;
         }
     }
 
@@ -92,14 +91,13 @@ class Decoder extends Worker
                 $this->setReplace($this->handle
                     ['body'], $body, 'body');
                 $this->patchBody();
-                $this->setClass('body', 
-                    gzencode($this->getClass(
-                        'body')));
+                $this->setClass('body', gzencode(
+                    $this->getClass('body')));
                 break;
             case 'text':
                 $body = $this->handle['body'];
-                $this->setReplace($body,
-                    $this->body, 'body');
+                $this->setReplace($body, 
+                        $this->body, 'body');
                 $this->patchBody();
                 break;
             default:
@@ -128,7 +126,7 @@ class Decoder extends Worker
                 ? $data = $this->getClass('headers')
                     : $data = [];
             foreach ($data as $key => $value) {
-                $key === 'Status-Line' ? header("{$key}")
+                $key === 'Status-Line' ? header("{$value}")
                  : header("{$key}: {$value}");
             }
         }
