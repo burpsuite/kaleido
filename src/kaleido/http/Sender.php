@@ -55,10 +55,9 @@ class Sender extends Worker
         $this->setError($curl->error, $curl->errorCode);
         $this->setHeaders($curl->responseHeaders);
         $this->setCookies($curl->responseCookies);
-        if (!$curl->error) {
-            $this->setBody($curl->response,
-                $curl->responseHeaders);
-        }
+        $curl->error ? $this->setBody($curl->errorMessage, 
+            $curl->responseHeaders) : $this->setBody(
+        $curl->response, $curl->responseHeaders);
     }
 
     private function lockClass() {
