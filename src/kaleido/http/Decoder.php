@@ -35,8 +35,8 @@ class Decoder extends Worker
     }
 
     private function handle() {
-        $this->checkError();
         parent::switchHandle('response');
+        $this->checkError();
         $this->setHeaders()->setCookies();
         $this->setTiming()->setUniqueId()
         ->setBody()->setHandle();
