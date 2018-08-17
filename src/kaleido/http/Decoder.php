@@ -128,7 +128,8 @@ class Decoder extends Worker
                 ? $data = $this->getClass('headers')
                     : $data = [];
             foreach ($data as $key => $value) {
-                header("{$key}: {$value}");
+                $key === 'Status-Line' ? header("{$key}")
+                 : header("{$key}: {$value}");
             }
         }
         return $this;
