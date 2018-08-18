@@ -15,7 +15,7 @@ class Replay extends Worker
     public $appId;
     public $appKey;
     public $masterKey;
-    public $endPoint;
+    public $apiServer;
     public $className;
 
     /**
@@ -61,7 +61,7 @@ class Replay extends Worker
             case 'leancloud':
                 Client::initialize($this->appId,
                     $this->appKey, $this->masterKey);
-                Client::setServerUrl($this->endPoint);
+                Client::setServerUrl($this->apiServer);
                 break;
         }
     }

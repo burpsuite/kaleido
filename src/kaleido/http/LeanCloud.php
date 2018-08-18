@@ -1,0 +1,94 @@
+<?php
+
+namespace Kaleido\Http;
+
+use LeanCloud\CloudException;
+use LeanCloud\LeanObject;
+use LeanCloud\Query;
+use LeanCloud\Client;
+
+class LeanCloud 
+{
+    public static $payload = [];
+	public static $masterKey;
+	public static $appKey;
+	public static $appId;
+	public static $apiServer;
+	public static $className;
+
+	public static function setMasterKey($masterKey) {
+		return \is_string($masterKey)
+		 ? self::$masterKey = $masterKey : null;
+	}
+
+	public static function setAppKey($appKey) {
+		return \is_string($appKey)
+		 ? self::$appKey = $appKey : null;
+	}
+
+	public static function setAppId($appId) {
+		return \is_string($appId)
+		 ? self::$appId = $appId : null;
+	}
+
+	public static function setClassName($className) {
+		return \is_string($className)
+		 ? self::$className = $className : null;
+	}
+
+	public static function setApiServer($apiServer) {
+		return \is_string($apiServer)
+		 ? self::$apiServer = $apiServer : null;
+	}
+
+	public static function setRequest() {
+		return !\is_array(Sender::response(false))
+            ?: self::setPayload('request', Sender::response(false));
+	}
+
+	public static function setResponse() {
+		return !\is_array(Sender::response(false))
+            ?: self::setPayload('response', Sender::response(false));
+	}
+
+	public function initialize() {
+	    return \is_string(self::$className)
+            ? new LeanObject(self::$className) : false;
+	}
+
+	public static function setPayload($name, $value = null) {
+	    return !\is_string($name)
+            ?: self::$payload[$name] = $value;
+    }
+
+    public static function getPayload($name = null) {
+	    return self::$payload[$name] ?? false;
+    }
+
+    public function set(LeanObject $class, $name = null) {
+	    $class->set($name, self::getPayload($name));
+    }
+
+    public function setClass($class) {
+        self::setApiServer($class->apiServer);
+        self::setAppId($class->appId);
+        self::setAppKey($class->appKey);
+        self::setMasterKey($class->masterKey);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -76,8 +76,7 @@ class Loader extends Worker
         new Encoder($taskId, $url);
         new Sender(Encoder::class(false));
         new Decoder(Sender::response(false));
-        new Recorder(Encoder::class(false),
-            Sender::response(false));
+        new Capture();
         return Decoder::getBody();
     }
 
