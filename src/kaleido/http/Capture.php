@@ -38,7 +38,7 @@ class Capture extends Worker
      */
     private function handle($needRecord, $activity = null, $objectId = null) {
         switch ($this->logType) {
-            case $this->logType === 'leancloud' && $needRecord:
+            case ('leancloud' && $needRecord):
                 $this->setTiming('RecTiming');
                 $this->getEnv('capture');
                 $this->unLogType();
@@ -54,7 +54,7 @@ class Capture extends Worker
                 $this->setObjectId($init);
                 $this->setTiming('RecTiming');
                 break;
-            case $this->logType === 'leancloud' && !$needRecord:
+            case 'leancloud':
                 $this->inActivity($activity);
                 $this->getEnv('capture');
                 $this->unLogType();
