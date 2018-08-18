@@ -14,6 +14,9 @@ class Loader extends Worker
     public $loadData;
     public $loadCache = [];
 
+    /**
+     * @throws \ErrorException
+     */
     public function _load() {
         $this->getEnv('database');
         $this->unLoadInfo();
@@ -21,6 +24,9 @@ class Loader extends Worker
         $this->lockClass();
     }
 
+    /**
+     * @throws \ErrorException
+     */
     public function loadType() {
         switch ($this->loadType) {
             case 'local':
@@ -86,6 +92,9 @@ class Loader extends Worker
         return Replay::getBody();
     }
 
+    /**
+     * @throws \ErrorException
+     */
     private function complete() {
         $this->getClass('isExist')
             ?: $this->fetchLoadData();
@@ -145,7 +154,7 @@ class Loader extends Worker
     }
 
     private function isDynamicType() {
-        if (in_array($this->getCacheType(), $this->allow)) {
+        if (\in_array($this->getCacheType(), $this->allow, true)) {
             $this->setLoadCache('data', getenv(
                  $this->getLoadCache('data')
             ));

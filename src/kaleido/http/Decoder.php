@@ -50,7 +50,7 @@ class Decoder extends Worker
         }
     }
 
-    public static function getHandle() {
+    public static function getHandle() :array {
         return \is_array(self::$handle_list)
             ? self::$handle_list : [];
     }
@@ -126,7 +126,8 @@ class Decoder extends Worker
                 ? $data = $this->getClass('headers')
                     : $data = [];
             foreach ($data as $key => $value) {
-                $key === 'Status-Line' ? header("{$value}")
+                $key === 'Status-Line'
+                    ? header("{(string)$value}")
                  : header("{$key}: {$value}");
             }
         }
