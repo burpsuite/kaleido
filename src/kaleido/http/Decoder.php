@@ -127,7 +127,7 @@ class Decoder extends Worker
                     : $data = [];
             foreach ($data as $key => $value) {
                 $key === 'Status-Line'
-                    ? header("{(string)$value}")
+                    ? header("{$value}")
                  : header("{$key}: {$value}");
             }
         }
