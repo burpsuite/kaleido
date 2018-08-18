@@ -9,7 +9,7 @@ use LeanCloud\Client;
 
 class LeanCloud 
 {
-    public static $payload = [];
+	public static $payload = [];
 	public static $masterKey;
 	public static $appKey;
 	public static $appId;
