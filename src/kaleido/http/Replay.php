@@ -7,9 +7,9 @@ use LeanCloud\Query;
 
 class Replay extends Worker
 {
-    public $action = ['history', 'current'];
     private static $lock;
     public static $body;
+    public $activity = ['history', 'current'];
     public $saveType;
     public $saveInfo = [];
     public $appId;
@@ -20,21 +20,21 @@ class Replay extends Worker
 
     /**
      * Replay constructor.
-     * @param $action
+     * @param $activity
      * @param $objectId
      * @throws \ErrorException
      */
-    public function __construct($action, $objectId) {
-        $this->checkActivity($action);
+    public function __construct($activity, $objectId) {
+        $this->inActivity($activity);
         $this->getEnv('record');
         $this->caseType($objectId);
-        $this->handle($action);
+        $this->handle($activity);
     }
 
-    private function checkActivity($action) {
-        \in_array($action, $this->action, true)
+    private function inActivity($activity) {
+        \in_array($activity, $this->activity, true)
          ?: new HttpException(
-            self::getError('request_action'), -500
+            self::getError('request_activity'), -500
         );
     }
 
@@ -89,11 +89,11 @@ class Replay extends Worker
     }
 
     /**
-     * @param $action
+     * @param $activity
      * @throws \ErrorException
      */
-    private function handle($action) {
-        switch ($action) {
+    private function handle($activity) {
+        switch ($activity) {
             case 'history':
                 $this->switchHandle('request');
                 $this->setTiming();

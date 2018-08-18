@@ -106,7 +106,7 @@ class Worker
             'abnormal'=> 'target server status is abnormal.',
             'request_host'=> 'request_host and kaleido do not match.',
             'request_method'=> 'request_method and kaleido do not match',
-            'request_action'=> 'request_action and kaleido do not match',
+            'request_activity'=> 'request_action and kaleido do not match',
             'non_array'=> 'payload is a non-array type.',
             'non_string'=> 'payload_url is a non-string type.',
             'payload_host'=> 'payload_host is a invalid protocol.',
