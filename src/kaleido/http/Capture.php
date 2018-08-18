@@ -79,6 +79,8 @@ class Capture extends Worker
         if (\is_string($class->get('objectId'))) {
             \is_array($response = Sender::response(false))
                 ?: $response = [];
+            $this->handle['enable_header']
+                 = $this->getHandleItem('enable_header');
             !$this->getHandleItem('enable_header')
                 ?: header("X-RecId: {$class->get('objectId')}");
         }
