@@ -18,20 +18,20 @@ class Capture extends Worker
      * Capture constructor.
      * @throws CloudException
      */
-    public function __construct() {
+    public function __construct($needRecord = false) {
         $this->setTiming('RecTiming');
         $this->getEnv('record');
-        $this->handle();
+        $this->handle($needRecord);
         $this->setTiming('RecTiming');
     }
 
     /**
      * @throws CloudException
      */
-    private function handle() {
+    private function handle($needRecord) {
         switch ($this->logType) {
-            case 'leancloud':
-                $this->switchType();
+            case 'leancloud' && $needRecord:
+                $this->unLogType();
                 $lean = new LeanCloud();
                 $init = $lean->initialize();
                 $lean->setClass($this);
@@ -45,7 +45,7 @@ class Capture extends Worker
         }
     }
 
-    private function switchType() {
+    private function unLogType() {
         \is_array($type = $this->{$this->logType}) ?: $type = [];
         foreach ($type as $key => $value) {
             $this->$key = $value;
