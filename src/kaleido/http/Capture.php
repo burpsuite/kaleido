@@ -31,12 +31,16 @@ class Capture extends Worker
     private function handle() {
         switch ($this->logType) {
             case 'leancloud':
+                $this->switchType();
                 $lean = new LeanCloud();
+                $init = $lean->initialize();
                 $lean->setClass($this);
                 $lean::setRequest();
                 $lean::setResponse();
-                $this->switchType();
-                $this->setCapture();
+                $lean->set($init, 'response');
+                $lean->set($init, 'request');
+                $init->save();
+                $this->setObjectId($init);
                 break;
         }
     }
@@ -45,22 +49,6 @@ class Capture extends Worker
         \is_array($type = $this->{$this->logType}) ?: $type = [];
         foreach ($type as $key => $value) {
             $this->$key = $value;
-        }
-    }
-
-    /**
-     * @throws CloudException
-     */
-    private function setCapture() {
-        switch ($this->logType) {
-            case 'leancloud':
-                $lean = new LeanCloud();
-                $init = $lean->initialize();
-                $lean->set($init, 'response');
-                $lean->set($init, 'request');
-                $init->save();
-                $this->setObjectId($init);
-                break;
         }
     }
 
