@@ -84,6 +84,7 @@ class LeanCloud
         self::setApiServer($class->apiServer);
         self::setAppId($class->appId);
         self::setAppKey($class->appKey);
+        self::setClassName($class->className);
         self::setMasterKey($class->masterKey);
     }
 }
