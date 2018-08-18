@@ -2,7 +2,6 @@
 
 namespace Kaleido\Http;
 
-use LeanCloud\CloudException;
 use LeanCloud\LeanObject;
 use LeanCloud\Query;
 use LeanCloud\Client;
@@ -37,8 +36,8 @@ class LeanCloud
     }
 
     public static function setApiServer($apiServer) {
-        return \is_string($apiServer)
-         ? self::$apiServer = $apiServer : null;
+        \is_string($apiServer)
+         ? Client::setServerUrl($apiServer) : null;
     }
 
     public static function setRequest() {
@@ -51,9 +50,17 @@ class LeanCloud
             ?: self::setPayload('response', Sender::response(false));
     }
 
-    public function initialize() {
-        return \is_string(self::$className)
-            ? new LeanObject(self::$className) : false;
+    public static function initialize() {
+        Client::initialize(self::$appId,
+            self::$appKey, self::$masterKey);
+    }
+
+    public function leanObject() :LeanObject {
+        return new LeanObject(self::$className);
+    }
+
+    public function leanQuery() :Query {
+        return new Query(self::$className);
     }
 
     public static function setPayload($name, $value = null) {
@@ -67,6 +74,10 @@ class LeanCloud
 
     public function set(LeanObject $class, $name = null) {
         $class->set($name, self::getPayload($name));
+    }
+
+    public function get(Query $class, $name = null) :LeanObject {
+        return $class->get($name);
     }
 
     public function setClass($class) {

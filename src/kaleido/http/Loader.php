@@ -69,10 +69,11 @@ class Loader extends Worker
     /**
      * @param $taskId
      * @param $url
-     * @return mixed|string
+     * @return string
      * @throws \ErrorException
+     * @throws \LeanCloud\CloudException
      */
-    public function listenHttp($taskId, $url) {
+    public function listenHttp($taskId, $url) :string {
         new Encoder($taskId, $url);
         new Sender(Encoder::class(false));
         new Decoder(Sender::response(false));
@@ -81,14 +82,15 @@ class Loader extends Worker
     }
 
     /**
-     * @param $action
+     * @param $activity
      * @param $objectId
-     * @return mixed
+     * @return string
      * @throws \ErrorException
+     * @throws \LeanCloud\CloudException
      */
-    public function replayHttp($action, $objectId) {
-        new Replay($action, $objectId);
-        return Replay::getBody();
+    public function replayHttp($activity, $objectId) :string {
+        new Capture(false, $activity, $objectId);
+        return Decoder::getBody();
     }
 
     /**
