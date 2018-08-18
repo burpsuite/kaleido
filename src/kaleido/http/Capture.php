@@ -11,7 +11,7 @@ class Capture extends Worker
     public $apiServer;
     public $appId;
     public $appKey;
-	public $logType;
+    public $logType;
     public $masterKey;
 
     /**
