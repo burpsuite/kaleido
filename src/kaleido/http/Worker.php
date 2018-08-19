@@ -24,7 +24,8 @@ class Worker
     protected function matchTaskId($taskId = false) {
         if (array_key_exists($taskId ?: $taskId = $this->taskId, $this->route)) {
             foreach ($this->route[$taskId] as $key => $value) {
-                $this->$key = $value;
+                !\in_array($key, get_class_vars($this), true)
+                    ?: $this->$key = $value;
             }
         }
     }
