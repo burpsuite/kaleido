@@ -15,17 +15,14 @@ class Worker
      * @throws \ErrorException
      */
     protected function load() {
-            (new Loader())->_load();
-        return $this->route = json_decode(
-            Loader::fetch(), true);
+        return $this->route = json_decode(new Loader(), true);
     }
 
     /**
      * @param bool $taskId
      */
     protected function matchTaskId($taskId = false) {
-        $taskId ?: $taskId = $this->taskId;
-        if (array_key_exists($taskId, $this->route)) {
+        if (array_key_exists($taskId ?: $taskId = $this->taskId, $this->route)) {
             foreach ($this->route[$taskId] as $key => $value) {
                 $this->$key = $value;
             }
@@ -123,5 +120,9 @@ class Worker
 
     protected static function getError($errorId = null) {
         return self::errorItem()[$errorId] ?? null;
+    }
+
+    protected static function resetClass() :array {
+        return self::$class = [];
     }
 }

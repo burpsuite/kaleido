@@ -8,8 +8,8 @@ use Curl\CaseInsensitiveArray;
 class Sender extends Worker
 {
     private static $lock;
+    public $protocol = ['get', 'post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
     public $maxSize = 2097152;
-    public $allow = ['get', 'post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
     public $url;
     public $method;
     public $params = [];
@@ -98,7 +98,7 @@ class Sender extends Worker
     private function checkMethod() {
         \is_string($this->method) ?: new HttpException(
             self::getError('payload_method'), -500);
-        if (!\in_array($this->method, $this->allow, true)) {
+        if (!\in_array($this->method, $this->protocol, true)) {
             new HttpException(
                 self::getError('unsupport_type'), -400
             );

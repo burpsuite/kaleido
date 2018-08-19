@@ -19,7 +19,6 @@ class Capture extends Worker
 
     /**
      * Capture constructor.
-     * @param $needRecord
      * @param $activity
      * @param $objectId
      * @throws CloudException
@@ -32,7 +31,6 @@ class Capture extends Worker
     }
 
     /**
-     * @param $needRecord
      * @param $activity
      * @param $objectId
      * @throws CloudException
