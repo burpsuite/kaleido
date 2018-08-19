@@ -42,8 +42,9 @@ class Loader extends Worker
                 break;
             case 'remote':
                 $this->loadCache();
-                $this->loadRedis();
-                $this->complete();
+                $predis = $this->predisClient();
+                $this->loadRedis($predis);
+                $this->complete($predis);
                 $this->setConsole();
                 break;
         }
@@ -105,13 +106,11 @@ class Loader extends Worker
         return new Client($this->getLoadCache('data'));
     }
 
-    private function loadRedis() {
+    private function loadRedis(Client $predis) {
         $this->checkLoadData();
-        $predis = $this->predisClient();
         $this->generateHash();
         $this->isExist($predis);
         $this->isExpired($predis);
-        $predis->disconnect();
     }
 
     private function getLoadCache($name) {
@@ -151,12 +150,13 @@ class Loader extends Worker
     }
 
     /**
+     * @param Client $predis
      * @throws \ErrorException
      */
-    private function complete() {
-        $this->getClass('exist')
-            ?: $this->loadDatabase();
-        $this->saveRedis();
+    private function complete(Client $predis) {
+        $this->getClass('exist') ?: $this->loadDatabase();
+        $this->saveRedis($predis);
+        $predis->disconnect();
     }
 
     private function setConsole() {
@@ -189,16 +189,15 @@ class Loader extends Worker
     }
 
     private function getExpire(Client $predis) {
-        return $this->expire ?? $this->expire = json_decode(
-            $predis->get($this->hashExpire), true);
+        $this->getClass('expire') ?: $this->setClass('expire',
+            json_decode($predis->get($this->hashExpire), true));
+        return $this->getClass('expire');
     }
 
-    private function saveRedis() {
+    private function saveRedis(Client $predis) {
         if (!$this->getClass('expire')) {
-            $predis = $this->predisClient();
             $predis->set($this->hashName, $this->getClass('fetch'));
             $predis->set($this->hashExpire, $this->generateExpire());
-            $predis->disconnect();
         }
     }
 
