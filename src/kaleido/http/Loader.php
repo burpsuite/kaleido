@@ -42,7 +42,7 @@ class Loader extends Worker
                 break;
             case 'remote':
                 $this->loadCache();
-                $predis = $this->predisClient();
+                $predis = $this->predis();
                 $this->loadRedis($predis);
                 $this->complete($predis);
                 $this->setConsole();
@@ -102,7 +102,7 @@ class Loader extends Worker
         }
     }
 
-    private function predisClient() :Client {
+    private function predis() :Client {
         return new Client($this->getLoadCache('data'));
     }
 
