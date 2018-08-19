@@ -25,8 +25,10 @@ class Capture extends Worker
      * @throws CloudException
      * @throws \ErrorException
      */
-    public function __construct($needRecord, $activity = null, $objectId = null) {
-        $this->handle($needRecord, $activity, $objectId);
+    public function __construct($activity = null, $objectId = null) {
+        $this->setTiming('RecTiming');
+        $this->getEnv('capture');
+        $this->handle($activity, $objectId);
     }
 
     /**
@@ -36,11 +38,9 @@ class Capture extends Worker
      * @throws CloudException
      * @throws \ErrorException
      */
-    private function handle($needRecord, $activity = null, $objectId = null) {
+    private function handle($activity = null, $objectId = null) {
         switch ($this->logType) {
-            case ($this->logType === 'leancloud' && $needRecord):
-                $this->setTiming('RecTiming');
-                $this->getEnv('capture');
+            case 'leancloud' && $activity === null:
                 $this->unLogType();
                 $lean = new LeanCloud();
                 $lean->setClass($this);
@@ -54,9 +54,8 @@ class Capture extends Worker
                 $this->setObjectId($init);
                 $this->setTiming('RecTiming');
                 break;
-            case ($this->logType === 'leancloud' && $activity):
+            case 'leancloud' && $activity !== null:
                 $this->inActivity($activity);
-                $this->getEnv('capture');
                 $this->unLogType();
                 $lean = new LeanCloud();
                 $lean->setClass($this);

@@ -77,7 +77,7 @@ class Loader extends Worker
         new Encoder($taskId, $url);
         new Sender(Encoder::class(false));
         new Decoder(Sender::response(false));
-        new Capture(true);
+        new Capture();
         return Decoder::getBody();
     }
 
@@ -89,7 +89,7 @@ class Loader extends Worker
      * @throws \LeanCloud\CloudException
      */
     public function replayHttp($activity, $objectId) :string {
-        new Capture(false, $activity, $objectId);
+        new Capture($activity, $objectId);
         return Decoder::getBody();
     }
 
