@@ -73,10 +73,8 @@ class Worker
     }
 
     protected function getEnv($className) {
-        $data = Utility::bjsonDecode(
-            getenv(strtoupper($className)), true);
-        null !== $data ?: $data = []; 
-        foreach ($data as $key => $value) {
+        $data = Utility::bjsonDecode(getenv(strtoupper($className)), true);
+        foreach (null !== $data ?: $data = [] as $key => $value) {
             $this->$key = $value;
         }
     }
