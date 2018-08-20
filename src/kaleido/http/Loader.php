@@ -67,9 +67,11 @@ class Loader extends Worker
                 $this->isJson($this->getClass('fetch'));
                 break;
             case 'remote':
-                $curl = new Curl;
-                $curl->get($this->loadData);
-                $this->getResponse($curl->response);
+                if ($this->getClass('exist')) {
+                    $curl = new Curl;
+                    $curl->get($this->loadData);
+                    $this->getResponse($curl->response);
+                }
                 break;  
         }
     }
@@ -154,7 +156,7 @@ class Loader extends Worker
      * @throws \ErrorException
      */
     private function complete(Client $predis) {
-        $this->getClass('exist') ?: $this->loadDatabase();
+        $this->loadDatabase();
         $this->saveRedis($predis);
         $predis->disconnect();
     }
@@ -195,7 +197,7 @@ class Loader extends Worker
     }
 
     private function saveRedis(Client $predis) {
-        if (!$this->getClass('expire')) {
+        if ($this->getClass('expire') < 0) {
             $predis->set($this->hashName, $this->getClass('fetch'));
             $predis->set($this->hashExpire, $this->generateExpire());
         }
