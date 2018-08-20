@@ -24,7 +24,7 @@ class Worker
     protected function matchTaskId($taskId = false) {
         if (array_key_exists($taskId ?: $taskId = $this->taskId, $this->route)) {
             foreach ($this->route[$taskId] as $key => $value) {
-                !\in_array($key, get_class_vars($this), true)
+                !\key_exists($key, get_class_vars(get_class()))
                     ?: $this->$key = $value;
             }
         }
@@ -73,8 +73,9 @@ class Worker
     }
 
     protected function getEnv($className) {
-        $data = Utility::bjsonDecode(getenv(strtoupper($className)), true);
-        foreach (null !== $data ?: $data = [] as $key => $value) {
+        null !== $data = Utility::bjsonDecode(getenv(
+            strtoupper($className)), true) ?: $data = [];
+        foreach ($data as $key => $value) {
             $this->$key = $value;
         }
     }
