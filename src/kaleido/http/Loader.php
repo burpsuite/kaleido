@@ -230,7 +230,7 @@ class Loader extends Worker
         if ($this->getClass('exist')) {
             !$this->getExpire($predis)['expire'] - time() > 0
                 ?: $this->setClass('expire',
-                $this->getExpire($predis)['expire'] - time());
+            $this->getExpire($predis)['expire'] - time());
         }
     }
 }
