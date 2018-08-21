@@ -97,8 +97,8 @@ class Capture extends Worker
 
     private function fetch(LeanCloud $class, Query $init, $objectId) {
         $fetch = $class->get($init, $objectId);
-        $this->setClass('request', $fetch->get('request'));
-        $this->setClass('response', $fetch->get('response'));
+        parent::setClass('request', $fetch->get('request'));
+        parent::setClass('response', $fetch->get('response'));
     }
 
     /**
@@ -110,12 +110,12 @@ class Capture extends Worker
             case 'history':
                 $this->switchHandle('request');
                 $this->setTiming();
-                new Decoder($this->getClass('response'));
+                new Decoder(parent::getClass('response'));
                 break;
             case 'current':
                 $this->switchHandle('request');
                 $this->setTiming();
-                new Sender($this->getClass('request'));
+                new Sender(parent::getClass('request'));
                 $this->lockClass();
                 new Decoder(Sender::response(false));
                 break;

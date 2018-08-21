@@ -27,27 +27,30 @@ class Decoder extends Worker
     }
 
     private function unResponse($response) {
-        if (\is_array($response)) {
-            foreach ($response as $key => $value) {
-                $this->$key = $value;
-            }
+        foreach ($response as $key => $value) {
+            $this->$key = $value;
         }
     }
 
     private function handle() {
         parent::switchHandle('response');
-        $this->checkError();
+        $this->setHandle()->checkError();
         $this->setHeaders()->setCookies();
         $this->setTiming()->setUniqueId()
-        ->setBody()->setHandle();
+        ->setBody();
     }
 
     private function checkError() {
-        if (!$this->handle['allow_error']) {
+        if (!self::getHandle()['allow_error']) {
             $this->error && \is_int($this->errorCode)
                 ? new HttpException(self::getError('abnormal'), 
             $this->errorCode) : false;
         }
+    }
+
+    private function lockClass() {
+        self::$lock = self::$class;
+        self::resetClass();
     }
 
     public static function getHandle() :array {
@@ -59,11 +62,7 @@ class Decoder extends Worker
         if (\is_array($this->handle)) {
             self::$handle_list = $this->handle;
         }
-    }
-
-    private function lockClass() {
-        self::$lock = self::$class;
-        self::resetClass();
+        return $this;
     }
 
     public static function class($encode) {
@@ -77,7 +76,7 @@ class Decoder extends Worker
     }
 
     private function setUniqueId() {
-        !$this->handle['enable_header']
+        !self::getHandle()['enable_header']
          ?: header('X-UniqueId:'.
                     uniqid('', true));
         return $this;
@@ -86,18 +85,14 @@ class Decoder extends Worker
     private function setBody() {
         switch ($this->respType) {
             case 'gzip':
-                $body = Utility::
-                    gzbaseDecode($this->body);
-                $this->setReplace($this->handle
-                    ['body'], $body, 'body');
+                $body = Utility::gzbaseDecode($this->body);
+                $this->setReplace(self::getHandle()['body'], $body, 'body');
                 $this->patchBody();
-                $this->setClass('body', gzencode(
-                    $this->getClass('body')));
+                parent::setClass('body', gzencode(parent::getClass('body')));
                 break;
             case 'text':
-                $body = $this->handle['body'];
-                $this->setReplace($body, 
-                        $this->body, 'body');
+                $body = self::getHandle()['body'];
+                $this->setReplace($body, $this->body, 'body');
                 $this->patchBody();
                 break;
             default:
@@ -106,11 +101,11 @@ class Decoder extends Worker
     }
 
     private function patchBody() {
-        if (\is_array(json_decode($this->getClass('body'), true))) {
-            \is_array($this->handle['body_patch'])
-                ? $patch = $this->handle['body_patch'] : $patch = [];
-            $body = json_decode($this->getClass('body'), true);
-            $this->setClass('body', json_encode(
+        if (\is_array(json_decode(self::getClass('body'), true))) {
+            \is_array(self::getHandle()['body_patch'])
+                ? $patch = self::getHandle()['body_patch'] : $patch = [];
+            $body = json_decode(parent::getClass('body'), true);
+            parent::setClass('body', json_encode(
                     array_replace_recursive($body, $patch)
                 )
             );
@@ -118,16 +113,16 @@ class Decoder extends Worker
     }
 
     private function setHeaders() {
-        if ($this->handle['enable_header']) {
-            $this->setClass('headers', $this->headers);
-            $this->setReplace($this->handle['header'], 
+        if (self::getHandle()['enable_header']) {
+            parent::setClass('headers', $this->headers);
+            $this->setReplace(self::getHandle()['header'], 
                 $this->headers, 'headers');
-            \is_array($this->getClass('headers'))
-                ? $data = $this->getClass('headers')
+            \is_array(parent::getClass('headers'))
+                ? $data = parent::getClass('headers')
                     : $data = [];
             foreach ($data as $key => $value) {
                 $key === 'Status-Line'
-                    ? header("{$value}")
+                    ? header("(string) ($value)")
                  : header("{$key}: {$value}");
             }
         }
@@ -135,12 +130,12 @@ class Decoder extends Worker
     }
 
     private function setCookies() {
-        if ($this->handle['enable_cookie']) {
-            $this->setClass('cookies', $this->cookies);
-            $this->setReplace($this->handle['cookie'], 
+        if (self::getHandle()['enable_cookie']) {
+            parent::setClass('cookies', $this->cookies);
+            $this->setReplace(self::getHandle()['cookie'], 
                 $this->cookies, 'cookies');
-            \is_array($this->getClass('cookies'))
-                ? $data = $this->getClass('cookies')
+            \is_array(parent::getClass('cookies'))
+                ? $data = parent::getClass('cookies')
                      : $data = [];
             foreach ($data as $key => $value) {
                 setcookie($key, $value);

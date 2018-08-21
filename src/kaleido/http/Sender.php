@@ -72,15 +72,15 @@ class Sender extends Worker
     }
 
     private function setTaskId() {
-        !\is_string($this->taskId) ?: 
-            $this->setClass('taskId', $this->taskId);
+        !\is_string($this->taskId) ?:
+            parent::setClass('taskId', $this->taskId);
             return $this;
     }
 
     private function setError($error, $errorCode) {
         if ($error && \is_int($errorCode)) {
-            $this->setClass('error', 1);
-            $this->setClass('errorCode', $errorCode);
+            parent::setClass('error', 1);
+            parent::setClass('errorCode', $errorCode);
         }
     }
 
@@ -137,16 +137,16 @@ class Sender extends Worker
     private function setBody($body, CaseInsensitiveArray $header) {
         switch ($body) {
             case \is_object($body):
-                $this->setClass('respType', 'text');
-                $this->setClass('body', json_encode($body));
+                parent::setClass('respType', 'text');
+                parent::setClass('body', json_encode($body));
                 break;
             case $this->isGzip($header):
-                $this->setClass('respType', 'gzip');
-                $this->setClass('body', base64_encode($body));
+                parent::setClass('respType', 'gzip');
+                parent::setClass('body', base64_encode($body));
                 break;
             default:
-                $this->setClass('respType', 'text');
-                $this->setClass('body', $body);
+                parent::setClass('respType', 'text');
+                parent::setClass('body', $body);
                 break;
         }
     }
@@ -160,7 +160,7 @@ class Sender extends Worker
     }
 
     private function setCookies($cookies) {
-        !\is_array($cookies) ?: 
-            $this->setClass('cookies', $cookies);
+        !\is_array($cookies) ?:
+            parent::setClass('cookies', $cookies);
     }
 }

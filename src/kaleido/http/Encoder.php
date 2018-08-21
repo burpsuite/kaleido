@@ -73,18 +73,18 @@ class Encoder extends Worker
 
     private function setMaxSize() {
         !\is_int($this->handle['maxSize'])
-            ?: $this->setMaxSize('maxSize', 
+            ?: parent::setClass('maxSize',
             $this->handle['maxSize']);
     }
 
     private function setTaskId($taskId) {
         !\is_string($taskId) 
-            ?: $this->setClass('taskId', $taskId);
+            ?: parent::setClass('taskId', $taskId);
         return $this;
     }
 
     private function setMethod() {
-        $this->setClass('method', $this->method
+        parent::setClass('method', $this->method
          = strtolower($_SERVER['REQUEST_METHOD']));
         return $this;
     }
@@ -93,18 +93,18 @@ class Encoder extends Worker
         switch ($this->method) {
             case $this->method === 'get' &&
                     $this->handle['fix_urlencode']:
-                $this->setClass('url', $this->getClass('url') .
+                parent::setClass('url', parent::getClass('url') .
                     $_SERVER['QUERY_STRING']);
                 break;
             case $this->method === 'get':
-                $this->setClass('params', $_GET);
+                parent::setClass('params', $_GET);
                 $this->setReplace($this->handle['url_param'],
                     $_GET, 'params');
                 break;
             case \in_array($this->method,
                     $this->allow, true) && \count($_POST) > 1:
                 $this->combineUrlParam();
-                $this->setClass('params', $_POST);
+                parent::setClass('params', $_POST);
                 $this->setReplace($this->handle['form_param'],
                     $_POST, 'params');
                 break;
@@ -120,22 +120,21 @@ class Encoder extends Worker
     }
 
     private function setUrl($url) {
-        $this->getClass('url')
-            ? $url = $this->getClass('url')
-                : $this->setClass('url', $url);
+        parent::getClass('url')
+            ? $url = parent::getClass('url')
+                : parent::setClass('url', $url);
         $this->setReplace($this->handle['url'], 
                 $url, 'url');
         return $this;
     }
 
     private function patchBody() {
-        if (\is_object(json_decode($this->getClass('body')))) {
+        if (\is_object(json_decode(parent::getClass('body')))) {
             \is_array($this->handle['body_patch'])
                 ? $patch = $this->handle['body_patch']
                     : $patch = [];
-            $body = json_decode($this->getClass('params'), true);
-            $this->setClass(
-                'params', json_encode(
+            $body = json_decode(parent::getClass('params'), true);
+            parent::setClass('params', json_encode(
                     array_replace_recursive($body, $patch)
                 )
             );
@@ -144,20 +143,20 @@ class Encoder extends Worker
 
     private function combineUrlParam() {
         $url_params = [];
-        $this->setClass('url_params', $_GET);
+        parent::setClass('url_params', $_GET);
         $this->setReplace($this->handle['url_param'], $_GET, 'url_params');
-        foreach ($this->getClass('url_params') as $key => $value) {
+        foreach (parent::getClass('url_params') as $key => $value) {
             $url_params .= $key.'='.$value.'&';
         }
-        !strpos($this->getClass('url'), "\?")
-            ?: $this->setClass('url', $this->getClass('url').'?');
-        $this->setClass('url', $this->getClass('url').rtrim($url_params, '&'));
+        !strpos(parent::getClass('url'), "\?")
+            ?: parent::setClass('url', parent::getClass('url').'?');
+        parent::setClass('url', parent::getClass('url').rtrim($url_params, '&'));
         unset(self::$class['url_params']);
     }
 
     private function setHeader() {
         if ($this->handle['enable_header']) {
-            $this->setClass('headers', Utility::getHeaders());
+            parent::setClass('headers', Utility::getHeaders());
             $this->setReplace($this->handle['header'], 
                 Utility::getHeaders(), 'headers');
         }
@@ -166,7 +165,7 @@ class Encoder extends Worker
 
     private function setCookie() {
         if ($this->handle['enable_cookie']) {
-            $this->setClass('cookies', $_COOKIE);
+            parent::setClass('cookies', $_COOKIE);
             $this->setReplace($this->handle['cookie'], 
                 $_COOKIE, 'cookies');
         }

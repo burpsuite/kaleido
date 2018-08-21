@@ -24,13 +24,17 @@ class Worker
     protected function matchTaskId($taskId = false) {
         if (array_key_exists($taskId ?: $taskId = $this->taskId, $this->route)) {
             foreach ($this->route[$taskId] as $key => $value) {
-                !\key_exists($key, get_class_vars(get_class()))
-                    ?: $this->$key = $value;
+                !\array_key_exists($key, get_class_vars(\get_class(__CLASS__)))
+                        ?: $this->$key = $value;
             }
         }
     }
 
-    protected function setClass($name, $value) {
+    protected static function getClass($name = 'null') {
+        return self::$class[$name] ?? null;
+    }
+
+    protected static function setClass($name, $value) {
         \is_string($name) ?: $name = 'null';
         switch ($name) {
             case \is_array($value) && !\count($value):
@@ -47,7 +51,7 @@ class Worker
 
     protected function setReplace($replace, $subject, $saveName) {
         \is_array($replace) && \count($replace) 
-            ?: $this->setClass($saveName, $subject);
+            ?: self::setClass($saveName, $subject);
         foreach ($replace as $key => $value) {
             switch ($replace) {
                 case \is_array($subject):
@@ -59,20 +63,16 @@ class Worker
                     }
                     break;
                 case \is_string($subject):
-                    $this->setClass($saveName, $subject
+                    self::setClass($saveName, $subject
                      = preg_replace("/{$key}/", $value, $subject));
                     break;
             }
         }
     }
 
-    protected function getClass($name = 'null') {
-        return self::$class[$name] ?? null;
-    }
-
     protected function getEnv($className) {
-        null !== $data = Utility::bjsonDecode(getenv(
-            strtoupper($className)), true) ?: $data = [];
+        null !== ($data = Utility::bjsonDecode(getenv(
+            strtoupper($className)), true)) ?: $data = [];
         foreach ($data as $key => $value) {
             $this->$key = $value;
         }
