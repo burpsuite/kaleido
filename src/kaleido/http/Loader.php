@@ -67,7 +67,7 @@ class Loader extends Worker
                 $this->isJson(parent::getClass('fetch'));
                 break;
             case 'remote':
-                if (parent::getClass('exist')) {
+                if (!parent::getClass('exist')) {
                     $curl = new Curl;
                     $curl->get($this->loadData);
                     $this->getResponse($curl->response);
@@ -156,7 +156,6 @@ class Loader extends Worker
      * @throws \ErrorException
      */
     private function complete(Client $predis) {
-        exit('debug');
         $this->loadDatabase();
         $this->saveRedis($predis);
         $predis->disconnect();
