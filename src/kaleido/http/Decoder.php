@@ -43,8 +43,8 @@ class Decoder extends Worker
     private function checkError() {
         if (!self::getHandle()['allow_error']) {
             $this->error && \is_int($this->errorCode)
-                ? new HttpException(self::getError('abnormal'), 
-            $this->errorCode) : false;
+                ? new HttpException(self::getError('abnormal'),
+                $this->errorCode) : false;
         }
     }
 
@@ -77,8 +77,7 @@ class Decoder extends Worker
 
     private function setUniqueId() {
         !self::getHandle()['enable_header']
-         ?: header('X-UniqueId:'.
-                    uniqid('', true));
+            ?: header('X-UniqueId:'. uniqid('', true));
         return $this;
     }
 
@@ -115,15 +114,15 @@ class Decoder extends Worker
     private function setHeaders() {
         if (self::getHandle()['enable_header']) {
             parent::setClass('headers', $this->headers);
-            $this->setReplace(self::getHandle()['header'], 
+            $this->setReplace(self::getHandle()['header'],
                 $this->headers, 'headers');
             \is_array(parent::getClass('headers'))
                 ? $data = parent::getClass('headers')
-                    : $data = [];
+                : $data = [];
             foreach ($data as $key => $value) {
                 $key === 'Status-Line'
-                    ? header("(string) ($value)")
-                 : header("{$key}: {$value}");
+                    ? header((string) ($value))
+                    : header("{$key}: {$value}");
             }
         }
         return $this;
@@ -132,11 +131,11 @@ class Decoder extends Worker
     private function setCookies() {
         if (self::getHandle()['enable_cookie']) {
             parent::setClass('cookies', $this->cookies);
-            $this->setReplace(self::getHandle()['cookie'], 
+            $this->setReplace(self::getHandle()['cookie'],
                 $this->cookies, 'cookies');
             \is_array(parent::getClass('cookies'))
                 ? $data = parent::getClass('cookies')
-                     : $data = [];
+                : $data = [];
             foreach ($data as $key => $value) {
                 setcookie($key, $value);
             }

@@ -55,10 +55,9 @@ class Sender extends Worker
         $this->setError($curl->error, $curl->errorCode);
         $this->setHeaders($curl->responseHeaders);
         $this->setCookies($curl->responseCookies);
-        $curl->error ? $this->setBody(
-            $curl->response ?: $curl->errorMessage,
-            $curl->responseHeaders) : $this->setBody(
-        $curl->response, $curl->responseHeaders);
+        $curl->error ? $this->setBody($curl->response
+            ?? $curl->errorMessage, $curl->responseHeaders)
+            : $this->setBody($curl->response, $curl->responseHeaders);
     }
 
     private function lockClass() {
@@ -74,7 +73,7 @@ class Sender extends Worker
     private function setTaskId() {
         !\is_string($this->taskId) ?:
             parent::setClass('taskId', $this->taskId);
-            return $this;
+        return $this;
     }
 
     private function setError($error, $errorCode) {
@@ -86,7 +85,7 @@ class Sender extends Worker
 
     private function checkUrl() {
         \is_string($this->url) ?: new HttpException(
-                self::getError('non_string'), -500);
+            self::getError('non_string'), -500);
         if (!preg_match('/https?\:\/\//', $this->url)) {
             new HttpException(
                 self::getError('payload_host'), -400
@@ -109,19 +108,19 @@ class Sender extends Worker
     private function checkParams() {
         $this->params
             ?: $this->params = [];
-            return $this;
+        return $this;
     }
 
     private function checkCookies() {
         \is_array($this->cookies)
             ?: $this->cookies = [];
-            return $this;
+        return $this;
     }
 
     private function checkHeaders() {
-        \is_array($this->headers) 
+        \is_array($this->headers)
             ?: $this->headers = [];
-            return $this;
+        return $this;
     }
 
     private function checkMaxSize() {
