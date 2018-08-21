@@ -70,7 +70,6 @@ class Loader extends Worker
                 if (parent::getClass('exist')) {
                     $curl = new Curl;
                     $curl->get($this->loadData);
-                    exit(var_dump($curl));
                     $this->getResponse($curl->response);
                 }
                 break;  
@@ -157,6 +156,7 @@ class Loader extends Worker
      * @throws \ErrorException
      */
     private function complete(Client $predis) {
+        exit('debug');
         $this->loadDatabase();
         $this->saveRedis($predis);
         $predis->disconnect();
