@@ -32,6 +32,14 @@ class Loader extends Worker
         return (string)self::fetch();
     }
 
+    private function unpackClass($name = null) {
+        if(\is_array($this->$name)) {
+            foreach ($this->$name as $key => $value) {
+                $this->$key = $value;
+            }
+        }
+    }
+
     /**
      * @throws \ErrorException
      */
@@ -50,11 +58,14 @@ class Loader extends Worker
         }
     }
 
-    private function unpackClass($name = null) {
-        foreach ($this->{$name} as $key => $value) {
-            !\array_key_exists($key, get_class_vars(\get_class($this)))
-                    ?: $this->$key = $value;
-        }
+    private function loadCache() {
+        !\in_array($this->cacheType(), $this->allow,
+            true) ?: $this->setLoadCache('data',
+            getenv($this->getLoadCache('data')));
+    }
+
+    private function cacheType() {
+        return $this->loadCache['type'] ?? false;
     }
 
     /**
@@ -67,11 +78,9 @@ class Loader extends Worker
                 $this->isJson(parent::getClass('fetch'));
                 break;
             case 'remote':
-                if (!parent::getClass('expire')) {
-                    $curl = new Curl;
-                    $curl->get($this->loadData);
-                    $this->getResponse($curl->response);
-                }
+                $curl = new Curl;
+                $curl->get($this->loadData);
+                $this->getResponse($curl->response);
                 break;  
         }
     }
@@ -84,16 +93,6 @@ class Loader extends Worker
     private function local($setName, $fileName) {
         !\is_file($fileName) ?: parent::setClass($setName,
             file_get_contents($fileName));
-    }
-
-    private function loadCache() {
-        !\in_array($this->cacheType(), $this->allow, 
-            true) ?: $this->setLoadCache('data', 
-        getenv($this->getLoadCache('data')));
-    }
-
-    private function cacheType() {
-        return $this->loadCache['type'] ?? false;
     }
 
     private function checkLoadData() {
@@ -156,15 +155,24 @@ class Loader extends Worker
      * @throws \ErrorException
      */
     private function complete(Client $predis) {
-        $this->loadDatabase();
+        $this->checkEnableCache();
         $this->saveRedis($predis);
         $predis->disconnect();
     }
 
+    /**
+     * @throws \ErrorException
+     */
+    private function checkEnableCache() {
+        if (!\count($this->loadCache) || !parent::getClass('expire')) {
+            $this->loadDatabase();
+        }
+    }
+
     private function setConsole() {
-        parent::getClass('expire') ? error_log(
-            'redisExpire: ' . parent::getClass('expire'))
-            : error_log('redisExpire: 0');
+        \count($this->loadCache) && parent::getClass('expire')
+            ? error_log('redisExpire: ' . parent::getClass('expire'))
+                : error_log('redisExpire: 0');
     }
 
     private function lockClass() {
