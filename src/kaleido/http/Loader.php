@@ -70,6 +70,7 @@ class Loader extends Worker
                 if (parent::getClass('exist')) {
                     $curl = new Curl;
                     $curl->get($this->loadData);
+                    exit(var_dump($curl));
                     $this->getResponse($curl->response);
                 }
                 break;  

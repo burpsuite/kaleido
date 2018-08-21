@@ -15,8 +15,8 @@ class Worker
      * @throws \ErrorException
      */
     protected function load() {
-        exit(print_r(new Loader()));
-        return $this->route = json_decode(new Loader, true);
+        return $this->route =
+            json_decode(new Loader, true);
     }
 
     /**
