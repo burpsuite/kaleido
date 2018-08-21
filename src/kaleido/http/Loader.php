@@ -52,7 +52,7 @@ class Loader extends Worker
 
     private function unpackClass($name = null) {
         foreach ($this->{$name} as $key => $value) {
-            !\array_key_exists($key, get_class_vars(\get_class(__CLASS__)))
+            !\array_key_exists($key, get_class_vars(\get_class($this)))
                     ?: $this->$key = $value;
         }
     }
