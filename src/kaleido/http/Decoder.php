@@ -63,7 +63,7 @@ class Decoder extends Worker
 
     private function lockClass() {
         self::$lock = self::$class;
-        self::$class = [];
+        self::resetClass();
     }
 
     public static function class($encode) {

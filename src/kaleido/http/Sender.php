@@ -9,7 +9,7 @@ class Sender extends Worker
 {
     private static $lock;
     public $protocol = ['get', 'post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
-    public $maxSize = 2097152;
+    public $maxSize;
     public $url;
     public $method;
     public $params = [];
@@ -63,7 +63,7 @@ class Sender extends Worker
 
     private function lockClass() {
         self::$lock = self::$class;
-        self::$class = [];
+        self::resetClass();
     }
 
     public static function response($encode) {

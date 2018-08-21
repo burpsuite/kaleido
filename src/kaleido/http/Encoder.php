@@ -26,19 +26,18 @@ class Encoder extends Worker
 
     private function check($url) {
         $this->switchHandle('request');
-        $this->checkHost($url)
-        ->checkMethod();
+        $this->checkHost($url)->checkMethod();
     }
 
     private function handle($taskId, $url) {
         $this->setTaskId($taskId)->setMethod()
         ->setUrl($url)->setUrlParam()->setUrl($url)
-        ->setCookie()->setHeader();
+        ->setCookie()->setHeader()->setMaxSize();
     }
 
     private function lockClass() {
         self::$lock = self::$class;
-        self::$class = [];
+        self::resetClass();
     }
 
     public static function class($encode) {
@@ -72,6 +71,12 @@ class Encoder extends Worker
         return $this;
     }
 
+    private function setMaxSize() {
+        !\is_int($this->handle['maxSize'])
+            ?: $this->setMaxSize('maxSize', 
+            $this->handle['maxSize']);
+    }
+
     private function setTaskId($taskId) {
         !\is_string($taskId) 
             ?: $this->setClass('taskId', $taskId);
@@ -79,9 +84,8 @@ class Encoder extends Worker
     }
 
     private function setMethod() {
-        $this->setClass(
-            'method', $this->method = strtolower(
-                $_SERVER['REQUEST_METHOD']));
+        $this->setClass('method', $this->method
+         = strtolower($_SERVER['REQUEST_METHOD']));
         return $this;
     }
 
