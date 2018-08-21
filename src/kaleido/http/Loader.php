@@ -67,6 +67,7 @@ class Loader extends Worker
                 $this->isJson(parent::getClass('fetch'));
                 break;
             case 'remote':
+                exit(print_r(self::$class));
                 if (!parent::getClass('exist')) {
                     $curl = new Curl;
                     $curl->get($this->loadData);
