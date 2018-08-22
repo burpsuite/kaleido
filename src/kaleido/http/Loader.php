@@ -185,9 +185,8 @@ class Loader extends Worker
     }
 
     private function setConsole() {
-        exit(var_dump(parent::getClass('expire')));
-        !parent::getClass('expired') ? error_log('redisExpire: ' .
-            (int)parent::getClass('expire') - time()) : error_log('redisExpire: 0');
+        parent::getClass('expired') ? error_log('redisExpire: 0')
+         : error_log('redisExpire: '. (parent::getClass('expire') - time()));
     }
 
     private function lockClass() {
