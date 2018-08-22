@@ -252,7 +252,7 @@ class Loader extends Worker
     }
 
     private function isExpired() {
-        if (parent::getClass('expire') - time() > 0) {
+        if (parent::getClass('expire') - time() < 0) {
             parent::setClass('expired', true);
         }
     }
