@@ -63,7 +63,7 @@ class Loader extends Worker
             case !\count($this->loadCache):
                 $this->loadDatabase();
                 break;
-            case \count($this->loadCache):
+            case \count($this->loadCache) > 1:
                 $predis = $this->predis();
                 $this->loadRedis($predis);
                 $this->complete($predis);
