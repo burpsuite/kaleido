@@ -50,7 +50,7 @@ class Loader extends Worker
                 break;
             case 'remote':
                 $this->unpackLoadCache();
-                $this->checkEnableRedis();
+                $this->isEnableRedis();
                 break;
         }
     }
@@ -58,7 +58,7 @@ class Loader extends Worker
     /**
      * @throws \ErrorException
      */
-    private function checkEnableRedis() {
+    private function isEnableRedis() {
         switch ($this->loadCache) {
             case !\count($this->loadCache):
                 $this->loadDatabase();
@@ -124,8 +124,9 @@ class Loader extends Worker
     private function loadRedis(Client $predis) {
         $this->checkLoadData();
         $this->generateHash();
+        $this->unpackExpire($predis);
         $this->isExist($predis);
-        $this->isExpired($predis);
+        $this->isExpired();
     }
 
     private function getLoadCache($name) {
@@ -178,14 +179,16 @@ class Loader extends Worker
      * @throws \ErrorException
      */
     private function checkValidCache() {
-        !parent::getClass('exist')
-            || parent::getClass('expire') < 0
-            ? $this->loadDatabase() : false;
+        parent::getClass('exist')
+        || !parent::getClass('expired')
+            ?: $this->loadDatabase();
     }
 
     private function setConsole() {
-        parent::getClass('expire') ? error_log('redisExpire: ' .
-            parent::getClass('expire')) : error_log('redisExpire: 0');
+        !parent::getClass('expired')
+            ? error_log('redisExpire: ' .
+            parent::getClass('expire') - time())
+            : error_log('redisExpire: 0');
     }
 
     private function lockClass() {
@@ -211,14 +214,15 @@ class Loader extends Worker
         $this->hashName = sha1($this->loadData);
     }
 
-    private function getExpire(Client $predis) {
-        parent::getClass('expire') ?: parent::setClass('expire',
-            json_decode($predis->get($this->hashExpire), true));
+    private function unpackExpire(Client $predis) {
+        parent::getClass('expire') ?: parent::setClass(
+            'expire', json_decode($predis->get(
+                $this->hashExpire), true)['expire']);
         return parent::getClass('expire');
     }
 
     private function saveRedis(Client $predis) {
-        if (parent::getClass('expire') < 0) {
+        if (parent::getClass('expired')) {
             $predis->set($this->hashName, parent::getClass('fetch'));
             $predis->set($this->hashExpire, $this->generateExpire());
         }
@@ -239,7 +243,7 @@ class Loader extends Worker
 
     private function setFetch(Client $predis) {
         parent::setClass('fetch', $predis->get($this->hashName));
-        parent::setClass('exist', true);
+        parent::getClass('fetch') ?: parent::setClass('exist', true);
     }
 
     private function isExist(Client $predis) {
@@ -247,11 +251,9 @@ class Loader extends Worker
             ? $this->setFetch($predis) : false;
     }
 
-    private function isExpired(Client $predis) { 
-        if (parent::getClass('exist')) {
-            !$this->getExpire($predis)['expire'] - time() > 0
-                ?: parent::setClass('expire',
-            $this->getExpire($predis)['expire'] - time());
+    private function isExpired() {
+        if (parent::getClass('expire') - time() > 0) {
+            parent::setClass('expired', true);
         }
     }
 }
