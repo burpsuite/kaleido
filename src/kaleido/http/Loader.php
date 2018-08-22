@@ -243,7 +243,7 @@ class Loader extends Worker
 
     private function setFetch(Client $predis) {
         parent::setClass('fetch', $predis->get($this->hashName));
-        parent::getClass('fetch') ?: parent::setClass('exist', true);
+        !parent::getClass('fetch') ?: parent::setClass('exist', true);
     }
 
     private function isExist(Client $predis) {
