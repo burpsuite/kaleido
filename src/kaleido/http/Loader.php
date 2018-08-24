@@ -23,21 +23,13 @@ class Loader extends Worker
      */
     public function __construct() {
         $this->getEnv('database');
-        $this->unpackClass('loadInfo');
+        $this->unpackItem('loadInfo');
         $this->handle();
         $this->lockClass();
     }
 
     public function __toString() {
         return (string)self::fetch();
-    }
-
-    private function unpackClass($name = null) {
-        if(\is_array($this->$name)) {
-            foreach ($this->$name as $key => $value) {
-                $this->$key = $value;
-            }
-        }
     }
 
     /**

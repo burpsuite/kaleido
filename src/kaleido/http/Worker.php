@@ -70,6 +70,14 @@ class Worker
         }
     }
 
+    protected function unpackItem($name = null) {
+        if(\is_array($this->$name)) {
+            foreach ($this->$name as $key => $value) {
+                $this->$key = $value;
+            }
+        }
+    }
+
     protected function getEnv($className) {
         null !== ($data = Utility::bjsonDecode(getenv(
             strtoupper($className)), true)) ?: $data = [];

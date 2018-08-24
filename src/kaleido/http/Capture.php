@@ -39,7 +39,7 @@ class Capture extends Worker
     private function handle($activity = null, $objectId = null) {
         switch ($this->logType) {
             case $this->logType === 'leancloud' && $activity === null:
-                $this->unLogType();
+                $this->unpackItem($this->logType);
                 $lean = new LeanCloud();
                 $lean->setClass($this);
                 $lean::initialize();
@@ -54,7 +54,7 @@ class Capture extends Worker
                 break;
             case $this->logType === 'leancloud' && $activity !== null:
                 $this->inActivity($activity);
-                $this->unLogType();
+                $this->unpackItem($this->logType);
                 $lean = new LeanCloud();
                 $lean->setClass($this);
                 $lean::initialize();
@@ -62,13 +62,6 @@ class Capture extends Worker
                 $this->fetch($lean, $init, $objectId);
                 $this->activity($activity);
                 break;
-        }
-    }
-
-    private function unLogType() {
-        \is_array($type = $this->{$this->logType}) ?: $type = [];
-        foreach ($type as $key => $value) {
-            $this->$key = $value;
         }
     }
 
@@ -125,6 +118,6 @@ class Capture extends Worker
 
     private function lockClass() {
         self::$lock = self::$class;
-        self::$class = [];
+        parent::resetClass();
     }
 }
