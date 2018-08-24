@@ -41,7 +41,7 @@ class LeanCloud
     }
 
     public static function setRequest() {
-        return !\is_array(Sender::response(false))
+        return !\is_array(Encoder::class(false))
             ?: self::setPayload('request', Encoder::class(false));
     }
 
