@@ -17,12 +17,12 @@ Kaleido network traffic forwarding tool(api-gateway).
   * Support for Allowing/Denying the Display of Remote Server Status-Code.
   * ...
 
-## Usage
+## Install
 ```bash
 composer install burpsuite/kaleido
 ```
 
-
+## Usage
 Env Variable: DATABASE
 ```json
 {
