@@ -2,7 +2,7 @@
 Kaleido network traffic forwarding tool(api-proxy).
 
 ## Usage
-> Env Variable: DATABASE
+Env Variable: DATABASE
 ```json
 {
   "loadType": "remote",
@@ -18,7 +18,7 @@ Kaleido network traffic forwarding tool(api-proxy).
 ```
 
 ## Capture
-> Env Variable: Capture
+Env Variable: Capture
 ```json
 {
   "logType": "leancloud",
