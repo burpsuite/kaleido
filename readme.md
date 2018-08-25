@@ -51,7 +51,7 @@ composer install burpsuite/kaleido
 }
 ```
 
-## Example
+## Sample
 ```json
 [
   {
