@@ -23,7 +23,6 @@ composer install burpsuite/kaleido
 ```
 
 ## Usage
-Env Variable: DATABASE
 ```json
 {
   "loadType": "remote",
@@ -39,7 +38,6 @@ Env Variable: DATABASE
 ```
 
 ## Capture
-Env Variable: Capture
 ```json
 {
   "logType": "leancloud",
@@ -56,7 +54,7 @@ Env Variable: Capture
 ## Example
 ```json
 {
-  "5b36788ee0e42": {
+  {
     "desc": "httpbin",
     "host": ["http://httpbin.org", "https://httpbin.org"],
     "method": ["get", "post", "put"],
