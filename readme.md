@@ -33,6 +33,6 @@ Env Variable: Capture
 ```
 
 ## Maybe Later
-  * Support Stream
+  * Support Stream (react/stream)
   * Support Tag Replace
   * ...
