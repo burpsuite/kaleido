@@ -5,9 +5,9 @@
 {
   "logType": "leancloud",
   "leancloud": {
-    "appId": "pTPoK9Q7jGyTFpNLX8LKtOsz-MdYXbMMI",
-    "appKey": "uiTYApLfNDT03aiCKOxEUTNx",
-    "masterKey": "okrmXc4OT2hY1jUfKI7xzmUt",
+    "appId": "pTPoK9Q7jGyTFpNXXXXXXXX-MdYXbMMI",
+    "appKey": "uiTYApLfNDXXXXXXXXxEUTNx",
+    "masterKey": "okrmXcXXXXXXXXUfKI7xzmUt",
     "endPoint": "https://us-api.leancloud.cn",
     "className": "TrafficCapture"
   }
