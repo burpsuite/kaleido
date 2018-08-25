@@ -9,7 +9,7 @@ Kaleido network traffic forwarding tool(api-gateway).
   * Support Regular Expressions to Added/Delete/Modify Body(Request/Response).
   * Support Capture Request and Responses.
   * Support for Remote Server Status-Code Responses.
-  * Support Response Size Limit.
+  * Support Response Body Size Limit.
 
 ## Usage
 Env Variable: DATABASE
