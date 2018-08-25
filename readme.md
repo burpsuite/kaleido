@@ -8,7 +8,7 @@
     "appId": "pTPoK9Q7jGyTFpNXXXXXXXX-MdYXbMMI",
     "appKey": "uiTYApLfNDXXXXXXXXxEUTNx",
     "masterKey": "okrmXcXXXXXXXXUfKI7xzmUt",
-    "endPoint": "https://us-api.leancloud.cn",
+    "apiServer": "https://us-api.leancloud.cn",
     "className": "TrafficCapture"
   }
 }
