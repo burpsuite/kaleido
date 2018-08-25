@@ -6,12 +6,13 @@ Kaleido network traffic forwarding tool(api-gateway).
   * Support Added/Delete/Modify Http Headers(Request/Response).
   * Support for Replay Request(Current)/Response(History).
   * Support Added/Delete/Modify Cookies(Request/Response).
-  * Support Regular Expressions to Modify Request Url(Request/Response).
+  * Support Regular Expressions to Modify Request Url.
   * Support Regular Expressions to Added/Delete/Modify Body(Request/Response).
   * Support Patch Request/Response Json-Body(Does not support JSONP).
   * Support Capture Request and Responses.
   * Support for Remote Server Status-Code Responses.
   * Support Response Body Size Limit(By byte).
+  * Support Regular Expressions to Added/Delete/Modify Request Params.
 
 ## Usage
 Env Variable: DATABASE
