@@ -1,7 +1,7 @@
 # Kaleido(Scope)
 Kaleido network traffic forwarding tool(api-proxy).
 
-## Config
+## Usage
 > Env Variable: DATABASE
 ```json
 {
