@@ -1,6 +1,13 @@
 # Kaleido(Scope)
 Kaleido network traffic forwarding tool(api-gateway).
 
+## Description
+  * Support GET, POST, PUT, DELETE, PATCH, SEARCH and More Request Methods.
+  * Support for Replay Request(Current)/Response(History).
+  * Support Support Add/Delete/Modify Http Headers.
+  * Support Support Add/Delete/Modify Cookies.
+  * Support Capture Request and Response.
+
 ## Usage
 Env Variable: DATABASE
 ```json
