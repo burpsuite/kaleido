@@ -43,6 +43,51 @@ Env Variable: Capture
 }
 ```
 
+## Example
+```json
+{
+  "5b36788ee0e42": {
+    "desc": "httpbin",
+    "host": ["http://httpbin.org", "https://httpbin.org"],
+    "method": ["get", "post", "put"],
+    "handle": {
+      "request": {
+        "check_hostname": true,
+        "check_method": true,
+        "fix_urlencode": true,
+        "enable_header": true,
+        "enable_cookie": true,
+        "maxSize": 250000,
+        "url": {},
+        "url_param": {},
+        "form_param": {},
+        "body": {},
+        "body_patch": {},
+        "cookie": {},
+        "header": {
+          "Cookie": null,
+          "Host": null
+        }
+      },
+      "response": {
+        "allow_error": true,
+        "enable_header": true,
+        "enable_cookie": true,
+        "body": {},
+        "body_patch": {},
+        "cookie": {},
+        "header": {
+          "Connection": null,
+          "Transfer-Encoding": null,
+          "Content-Length": null,
+          "Access-Control-Allow-Origin": "*"
+        }
+      }
+    }
+  }
+}
+```
+
 ## Maybe Later
   * Support Stream (react/stream).
   * Support Tag Replace.
