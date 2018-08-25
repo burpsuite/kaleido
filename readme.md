@@ -18,6 +18,11 @@ Kaleido network traffic forwarding tool(api-gateway).
   * ...
 
 ## Usage
+```bash
+composer install burpsuite/kaleido
+```
+
+
 Env Variable: DATABASE
 ```json
 {
