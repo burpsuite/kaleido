@@ -65,8 +65,7 @@ Env Variable: Capture
         "body_patch": {},
         "cookie": {},
         "header": {
-          "Cookie": null,
-          "Host": null
+          "Cookie": null
         }
       },
       "response": {
