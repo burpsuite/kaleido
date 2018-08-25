@@ -1,7 +1,7 @@
 # Kaleido(Scope)
 
 ## Capture
-Env Variable: Capture
+> Env Variable: Capture
 ```json
 {
   "logType": "leancloud",
@@ -16,7 +16,7 @@ Env Variable: Capture
 ```
 
 ## Configuration
-Env Variable: DATABASE)
+> Env Variable: DATABASE
 ```json
 {
   "loadType": "remote",
