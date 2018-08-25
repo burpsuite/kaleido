@@ -1,5 +1,5 @@
 # Kaleido(Scope)
-Kaleido network traffic forwarding tool(api-proxy).
+Kaleido network traffic forwarding tool(api-gateway).
 
 ## Usage
 Env Variable: DATABASE
