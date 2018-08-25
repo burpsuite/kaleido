@@ -1,21 +1,6 @@
 # Kaleido(Scope)
 Kaleido network traffic forwarding tool(api-proxy).
 
-## Capture
-> Env Variable: Capture
-```json
-{
-  "logType": "leancloud",
-  "leancloud": {
-    "appId": "pTPoK9Q7jGyTFpNXXXXXXXX-MdYXbMMI",
-    "appKey": "uiTYApLfNDXXXXXXXXxEUTNx",
-    "masterKey": "okrmXcXXXXXXXXUfKI7xzmUt",
-    "apiServer": "https://us-api.leancloud.cn",
-    "className": "TrafficCapture"
-  }
-}
-```
-
 ## Config
 > Env Variable: DATABASE
 ```json
@@ -28,6 +13,21 @@ Kaleido network traffic forwarding tool(api-proxy).
       "data": "REDIS_URL",
       "interval": 86400
     }
+  }
+}
+```
+
+## Capture
+> Env Variable: Capture
+```json
+{
+  "logType": "leancloud",
+  "leancloud": {
+    "appId": "pTPoK9Q7jGyTFpNXXXXXXXX-MdYXbMMI",
+    "appKey": "uiTYApLfNDXXXXXXXXxEUTNx",
+    "masterKey": "okrmXcXXXXXXXXUfKI7xzmUt",
+    "apiServer": "https://us-api.leancloud.cn",
+    "className": "TrafficCapture"
   }
 }
 ```
