@@ -13,6 +13,7 @@ Kaleido network traffic forwarding tool(api-gateway).
   * Support for Remote Server Status-Code Responses.
   * Support Response Body Size Limit(By byte).
   * Support Regular Expressions to Added/Delete/Modify Request Params.
+  * Support for Allowing/Denying the Display of Remote Server Status-Code.
 
 ## Usage
 Env Variable: DATABASE
