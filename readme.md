@@ -92,6 +92,7 @@ Env Variable: Capture
 ```
 
 ## Maybe Later
+  * Support Socket (react/socket).
   * Support Stream (react/stream).
   * Support Tag Replace.
   * Support Capture to Redis.
