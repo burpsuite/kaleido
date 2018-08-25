@@ -10,7 +10,7 @@ Kaleido network traffic forwarding tool(api-gateway).
   * Support Patch Request/Response Json-Body(Does not support JSONP).
   * Support Capture Request and Responses.
   * Support for Remote Server Status-Code Responses.
-  * Support Response Body Size Limit.
+  * Support Response Body Size Limit(By byte).
 
 ## Usage
 Env Variable: DATABASE
