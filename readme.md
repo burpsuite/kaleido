@@ -33,6 +33,7 @@ Env Variable: Capture
 ```
 
 ## Maybe Later
-  * Support Stream (react/stream)
-  * Support Tag Replace
+  * Support Stream (react/stream).
+  * Support Tag Replace.
+  * Support Capture to Redis.
   * ...
