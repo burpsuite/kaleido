@@ -1,4 +1,5 @@
 # Kaleido(Scope)
+Kaleido network traffic forwarding tool(api-proxy).
 
 ## Capture
 > Env Variable: Capture
@@ -15,7 +16,7 @@
 }
 ```
 
-## Configuration
+## Config
 > Env Variable: DATABASE
 ```json
 {
