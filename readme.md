@@ -53,7 +53,7 @@ composer install burpsuite/kaleido
 
 ## Example
 ```json
-{
+[
   {
     "desc": "httpbin",
     "host": ["http://httpbin.org", "https://httpbin.org"],
@@ -92,7 +92,7 @@ composer install burpsuite/kaleido
       }
     }
   }
-}
+]
 ```
 
 ## Maybe Later
