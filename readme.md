@@ -36,4 +36,5 @@ Env Variable: Capture
   * Support Stream (react/stream).
   * Support Tag Replace.
   * Support Capture to Redis.
+  * Support for More Exception Handling.
   * ...
