@@ -41,8 +41,8 @@ class Loader extends Worker
                 $this->loadDatabase();
                 break;
             case 'remote':
-                $this->unpackLoadCache();
-                $this->isEnableRedis();
+                $this->unLoadCache();
+                $this->complete();
                 break;
         }
     }
@@ -50,24 +50,30 @@ class Loader extends Worker
     /**
      * @throws \ErrorException
      */
-    private function isEnableRedis() {
+    private function complete() {
         switch ($this->loadCache) {
             case !\count($this->loadCache):
                 $this->loadDatabase();
                 break;
             case \count($this->loadCache) > 1:
-                $predis = $this->predis();
-                $this->loadRedis($predis);
-                $this->complete($predis);
+                $redis = $this->predis();
+                $this->checkLoadData();
+                $this->generateHash();
+                $this->unpackExpire($redis);
+                $this->isExist($redis);
+                $this->isExpired();
+                $this->checkValidCache();
+                $this->saveRedis($redis);
+                $redis->disconnect();
                 $this->setConsole();
                 break;
         }
     }
 
-    private function unpackLoadCache() {
+    private function unLoadCache() {
         !\in_array($this->cacheType(), $this->allow, true)
             ?: $this->setLoadCache('data',
-            getenv($this->getLoadCache('data')));
+        getenv($this->getLoadCache('data')));
     }
 
     private function cacheType() {
@@ -113,14 +119,6 @@ class Loader extends Worker
         return new Client($this->getLoadCache('data'));
     }
 
-    private function loadRedis(Client $predis) {
-        $this->checkLoadData();
-        $this->generateHash();
-        $this->unpackExpire($predis);
-        $this->isExist($predis);
-        $this->isExpired();
-    }
-
     private function getLoadCache($name) {
         return $this->loadCache[$name] ?? false;
     }
@@ -158,22 +156,11 @@ class Loader extends Worker
     }
 
     /**
-     * @param Client $predis
-     * @throws \ErrorException
-     */
-    private function complete(Client $predis) {
-        $this->checkValidCache();
-        $this->saveRedis($predis);
-        $predis->disconnect();
-    }
-
-    /**
      * @throws \ErrorException
      */
     private function checkValidCache() {
-        parent::getClass('exist')
-        || !parent::getClass('expired')
-            ?: $this->loadDatabase();
+        parent::getClass('exist') || !parent::getClass('expired')
+                ?: $this->loadDatabase();
     }
 
     private function setConsole() {
