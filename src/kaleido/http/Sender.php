@@ -113,6 +113,7 @@ class Sender extends Worker
 
     private function checkMaxSize() {
         \is_int($this->maxSize) ?: $this->maxSize = 2097152;
+        return $this;
     }
 
     private function isGzip($header) :bool {
