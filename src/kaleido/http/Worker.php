@@ -57,24 +57,21 @@ class Worker
                 case \is_array($subject):
                     self::$class[$saveName][$key] = $value;
                     if (!$value) {
-                        unset(
-                            self::$class[$saveName][$key]
-                        );
+                        unset(self::$class[$saveName][$key]);
                     }
                     break;
                 case \is_string($subject):
-                    self::setClass($saveName, $subject
-                     = preg_replace("/{$key}/", $value, $subject));
+                    self::setClass($saveName, $subject = 
+                    preg_replace("/{$key}/", $value, $subject));
                     break;
             }
         }
     }
 
-    protected function unpackItem($name = null) {
-        if(\is_array($this->$name)) {
-            foreach ($this->$name as $key => $value) {
-                $this->$key = $value;
-            }
+    protected function unpackItem($data = null) {
+        \is_array($data) ?: $data = (array)$this->$data;
+        foreach ($data as $key => $value) {
+            $this->$key = $value;
         }
     }
 
@@ -124,8 +121,8 @@ class Worker
         ];
     }
 
-    protected static function getError($errorId = null) {
-        return self::errorItem()[$errorId] ?? null;
+    protected static function getError($id = null) {
+        return self::errorItem()[$id] ?? null;
     }
 
     protected static function resetClass() :array {

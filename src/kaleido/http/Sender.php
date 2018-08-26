@@ -22,18 +22,10 @@ class Sender extends Worker
      * @throws \ErrorException
      */
     public function __construct(array $payload) {
-        $this->unPayload($payload);
+        parent::unpackItem($payload);
         $this->check();
         $this->handle();
         $this->lockClass();
-    }
-
-    public function unPayload($payload) {
-        if (\is_array($payload)) {
-            foreach ($payload as $key => $value) {
-                $this->$key = $value;
-            }
-        }
     }
 
     public function check() {
@@ -57,7 +49,7 @@ class Sender extends Worker
         $this->setCookies($curl->responseCookies);
         $curl->error ? $this->setBody($curl->response
             ?? $curl->errorMessage, $curl->responseHeaders)
-            : $this->setBody($curl->response, $curl->responseHeaders);
+        : $this->setBody($curl->response, $curl->responseHeaders);
     }
 
     private function lockClass() {

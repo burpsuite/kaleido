@@ -45,14 +45,15 @@ class Encoder extends Worker
             : self::$lock;
     }
 
-    private function checkHost($url) {
+    private function getHost($url = null) :string {
+        return preg_replace('/^(https?\:\/\/.*?\..*?)\/.*/', '$1', $url);
+    }
+
+    private function checkHost($url = null) {
         if ($this->handle['check_hostname']) {
-            $host = preg_replace('/^(https?\:\/\/.*?\..*?)\/.*/', '$1', $url);
             !\is_string($this->host) ?: $this->host = [$this->host];
-            if (!\in_array($host, $this->host, true)) {
-                new HttpException(
-                    self::getError('request_host'), -400
-                );
+            if (!\in_array($this->getHost($url), $this->host, true)) {
+                new HttpException(self::getError('request_host'), -400);
             }
         }
         return $this;
@@ -60,32 +61,26 @@ class Encoder extends Worker
 
     private function checkMethod() {
         if ($this->handle['check_method']) {
-            $method = strtolower($_SERVER['REQUEST_METHOD']);
             !\is_string($this->method) ?: $this->method = [$this->method];
-            if (!\in_array($method, $this->method, true)) {
-                new HttpException(
-                    self::getError('request_method'), -400
-                );
+            if (!\in_array(strtolower($_SERVER['REQUEST_METHOD']), $this->method, true)) {
+                new HttpException(self::getError('request_method'), -400);
             }
         }
         return $this;
     }
 
     private function setMaxSize() {
-        !\is_int($this->handle['maxSize'])
-            ?: parent::setClass('maxSize',
-            $this->handle['maxSize']);
+        !\is_int($this->handle['maxSize']) ?: parent::setClass('maxSize', $this->handle['maxSize']);
+        return $this;
     }
 
     private function setTaskId($taskId) {
-        !\is_string($taskId) 
-            ?: parent::setClass('taskId', $taskId);
+        !\is_string($taskId) ?: parent::setClass('taskId', $taskId);
         return $this;
     }
 
     private function setMethod() {
-        parent::setClass('method', $this->method
-         = strtolower($_SERVER['REQUEST_METHOD']));
+        parent::setClass('method', $this->method = strtolower($_SERVER['REQUEST_METHOD']));
         return $this;
     }
 
@@ -119,12 +114,9 @@ class Encoder extends Worker
         return $this;
     }
 
-    private function setUrl($url) {
-        parent::getClass('url')
-            ? $url = parent::getClass('url')
-                : parent::setClass('url', $url);
-        $this->setReplace($this->handle['url'], 
-                $url, 'url');
+    private function setUrl($url = null) {
+        parent::getClass('url') ? $url = parent::getClass('url') : parent::setClass('url', $url);
+        $this->setReplace($this->handle['url'], $url, 'url');
         return $this;
     }
 

@@ -20,16 +20,10 @@ class Decoder extends Worker
      */
     public function __construct(array $response) {
         parent::load();
-        $this->unResponse($response);
+        parent::unpackItem($response);
         parent::matchTaskId();
         $this->handle();
         $this->lockClass();
-    }
-
-    private function unResponse($response) {
-        foreach ($response as $key => $value) {
-            $this->$key = $value;
-        }
     }
 
     private function handle() {
@@ -37,14 +31,14 @@ class Decoder extends Worker
         $this->setHandle()->checkError();
         $this->setHeaders()->setCookies();
         $this->setTiming()->setUniqueId()
-        ->setBody();
+        ->setCurrentDate()->setBody();
     }
 
     private function checkError() {
         if (!self::getHandle()['allow_error']) {
             $this->error && \is_int($this->errorCode)
                 ? new HttpException(self::getError('abnormal'),
-                $this->errorCode) : false;
+            $this->errorCode) : false;
         }
     }
 
@@ -59,9 +53,7 @@ class Decoder extends Worker
     }
 
     private function setHandle() {
-        if (\is_array($this->handle)) {
-            self::$handle_list = $this->handle;
-        }
+        !\is_array($this->handle) ?: self::$handle_list = $this->handle;
         return $this;
     }
 
@@ -73,6 +65,12 @@ class Decoder extends Worker
     public static function getBody() {
         return \is_string(self::$lock['body'])
             ? self::$lock['body'] : 'error_body';
+    }
+
+    private function setCurrentDate() {
+        !self::getHandle()['enable_header']
+            ?: header('X-Date:'. gmdate('c'));
+        return $this;
     }
 
     private function setUniqueId() {
@@ -90,8 +88,7 @@ class Decoder extends Worker
                 parent::setClass('body', gzencode(parent::getClass('body')));
                 break;
             case 'text':
-                $body = self::getHandle()['body'];
-                $this->setReplace($body, $this->body, 'body');
+                $this->setReplace(self::getHandle()['body'], $this->body, 'body');
                 $this->patchBody();
                 break;
             default:
@@ -116,12 +113,10 @@ class Decoder extends Worker
             parent::setClass('headers', $this->headers);
             $this->setReplace(self::getHandle()['header'],
                 $this->headers, 'headers');
-            \is_array(parent::getClass('headers'))
-                ? $data = parent::getClass('headers')
-                : $data = [];
+            \is_array(parent::getClass('headers')) 
+                ? $data = parent::getClass('headers') : $data = [];
             foreach ($data as $key => $value) {
-                $key === 'Status-Line'
-                    ? header((string) ($value))
+                $key === 'Status-Line' ? header((string) ($value))
                     : header("{$key}: {$value}");
             }
         }
@@ -134,8 +129,7 @@ class Decoder extends Worker
             $this->setReplace(self::getHandle()['cookie'],
                 $this->cookies, 'cookies');
             \is_array(parent::getClass('cookies'))
-                ? $data = parent::getClass('cookies')
-                : $data = [];
+                ? $data = parent::getClass('cookies') : $data = [];
             foreach ($data as $key => $value) {
                 setcookie($key, $value);
             }
