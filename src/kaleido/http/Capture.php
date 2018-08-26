@@ -46,8 +46,8 @@ class Capture extends Worker
                 $init = $lean->leanObject();
                 $lean::setRequest();
                 $lean::setResponse();
-                $lean->set($init, 'response');
                 $lean->set($init, 'request');
+                $lean->set($init, 'response');
                 $init->save();
                 $this->setObjectId($init);
                 $this->setTiming('RecTiming');

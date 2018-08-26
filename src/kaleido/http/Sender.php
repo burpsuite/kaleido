@@ -30,8 +30,8 @@ class Sender extends Worker
 
     public function check() {
         $this->checkUrl()->checkMethod()
-        ->checkParams()->checkCookies()
-        ->checkHeaders()->checkMaxSize();
+        ->checkMaxSize()->checkParams()
+        ->checkCookies()->checkHeaders();
     }
 
     /**
