@@ -63,8 +63,7 @@ class Sender extends Worker
     }
 
     private function setTaskId() {
-        !\is_string($this->taskId) ?:
-            parent::setClass('taskId', $this->taskId);
+        !\is_string($this->taskId) ?: parent::setClass('taskId', $this->taskId);
         return $this;
     }
 
@@ -98,31 +97,26 @@ class Sender extends Worker
     }
 
     private function checkParams() {
-        $this->params
-            ?: $this->params = [];
+        $this->params ?: $this->params = [];
         return $this;
     }
 
     private function checkCookies() {
-        \is_array($this->cookies)
-            ?: $this->cookies = [];
+        \is_array($this->cookies) ?: $this->cookies = [];
         return $this;
     }
 
     private function checkHeaders() {
-        \is_array($this->headers)
-            ?: $this->headers = [];
+        \is_array($this->headers) ?: $this->headers = [];
         return $this;
     }
 
     private function checkMaxSize() {
-        \is_int($this->maxSize)
-            ?: $this->maxSize = 2097152;
+        \is_int($this->maxSize) ?: $this->maxSize = 2097152;
     }
 
     private function isGzip($header) :bool {
-        return $header['Content-Encoding']
-            !== 'gzip' ? 0 : true;
+        return $header['Content-Encoding'] !== 'gzip' ? 0 : true;
     }
 
     private function setBody($body, CaseInsensitiveArray $header) {
@@ -151,7 +145,6 @@ class Sender extends Worker
     }
 
     private function setCookies($cookies) {
-        !\is_array($cookies) ?:
-            parent::setClass('cookies', $cookies);
+        !\is_array($cookies) ?: parent::setClass('cookies', $cookies);
     }
 }
