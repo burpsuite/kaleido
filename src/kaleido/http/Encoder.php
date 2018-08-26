@@ -86,8 +86,7 @@ class Encoder extends Worker
 
     private function setUrlParam() {
         switch ($this->method) {
-            case $this->method === 'get' &&
-                    $this->handle['fix_urlencode']:
+            case $this->method === 'get' && $this->handle['fix_urlencode']:
                 parent::setClass('url', parent::getClass('url') .
                     $_SERVER['QUERY_STRING']);
                 break;
@@ -96,15 +95,13 @@ class Encoder extends Worker
                 $this->setReplace($this->handle['url_param'],
                     $_GET, 'params');
                 break;
-            case \in_array($this->method,
-                    $this->allow, true) && \count($_POST) > 1:
+            case \in_array($this->method, $this->allow, true) && \count($_POST) > 1:
                 $this->combineUrlParam();
                 parent::setClass('params', $_POST);
                 $this->setReplace($this->handle['form_param'],
                     $_POST, 'params');
                 break;
-            case \in_array($this->method,
-                    $this->allow, true) && !\count($_POST):
+            case \in_array($this->method, $this->allow, true) && !\count($_POST):
                 $this->combineUrlParam();
                 $this->setReplace($this->handle['body'],
                     file_get_contents('php://input'), 'params');
