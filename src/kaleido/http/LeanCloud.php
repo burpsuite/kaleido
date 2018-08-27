@@ -40,14 +40,12 @@ class LeanCloud
          ? Client::setServerUrl($apiServer) : null;
     }
 
-    public static function setRequest() {
-        return !\is_array(Encoder::class(false))
-            ?: self::setPayload('request', Encoder::class(false));
+    public function setRequest(LeanObject $class) :LeanObject {
+        return $class->set('request', Encoder::class(false));
     }
 
-    public static function setResponse() {
-        return !\is_array(Sender::response(false))
-            ?: self::setPayload('response', Sender::response(false));
+    public function setResponse(LeanObject $class) :LeanObject {
+        return $class->set('response', Sender::response(false));
     }
 
     public static function initialize() {

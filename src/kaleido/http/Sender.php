@@ -63,14 +63,14 @@ class Sender extends Worker
     }
 
     private function setTaskId() {
-        !\is_string($this->taskId) ?: parent::setClass('taskId', $this->taskId);
+        !\is_string($this->taskId) ?: parent::setItem('taskId', $this->taskId);
         return $this;
     }
 
     private function setError($error, $errorCode) {
         if ($error && \is_int($errorCode)) {
-            parent::setClass('error', 1);
-            parent::setClass('errorCode', $errorCode);
+            parent::setItem('error', 1);
+            parent::setItem('errorCode', $errorCode);
         }
     }
 
@@ -121,19 +121,15 @@ class Sender extends Worker
     }
 
     private function setBody($body, CaseInsensitiveArray $header) {
-        switch ($body) {
-            case \is_object($body):
-                parent::setClass('respType', 'text');
-                parent::setClass('body', json_encode($body));
-                break;
-            case $this->isGzip($header):
-                parent::setClass('respType', 'gzip');
-                parent::setClass('body', base64_encode($body));
-                break;
-            default:
-                parent::setClass('respType', 'text');
-                parent::setClass('body', $body);
-                break;
+        if (\is_object($body)) {
+            parent::setItem('respType', 'text');
+            parent::setItem('body', json_encode($body));
+        } elseif ($this->isGzip($header)) {
+            parent::setItem('respType', 'gzip');
+            parent::setItem('body', base64_encode($body));
+        } else {
+            parent::setItem('respType', 'text');
+            parent::setItem('body', $body);
         }
     }
 
@@ -146,6 +142,6 @@ class Sender extends Worker
     }
 
     private function setCookies($cookies) {
-        !\is_array($cookies) ?: parent::setClass('cookies', $cookies);
+        !\is_array($cookies) ?: parent::setItem('cookies', $cookies);
     }
 }

@@ -25,7 +25,7 @@ class Capture extends Worker
      * @throws \ErrorException
      */
     public function __construct($activity = null, $objectId = null) {
-        $this->setTiming('RecTiming');
+        $this->setTiming('Rec-Timing');
         $this->getEnv('capture');
         $this->handle($activity, $objectId);
     }
@@ -44,13 +44,11 @@ class Capture extends Worker
                 $lean->setClass($this);
                 $lean::initialize();
                 $init = $lean->leanObject();
-                $lean::setRequest();
-                $lean::setResponse();
-                $lean->set($init, 'request');
-                $lean->set($init, 'response');
+                $lean->setRequest($init);
+                $lean->setResponse($init);
                 $init->save();
                 $this->setObjectId($init);
-                $this->setTiming('RecTiming');
+                $this->setTiming('Rec-Timing');
                 break;
             case $this->logType === 'leancloud' && $activity !== null:
                 $this->inActivity($activity);
@@ -67,48 +65,38 @@ class Capture extends Worker
 
     private function setObjectId(LeanObject $class) {
         if (\is_string($class->get('objectId'))) {
-            \is_array($response = Sender::response(false))
-                ?: $response = [];
-            $this->handle['enable_header']
-                 = $this->getHandleItem('enable_header');
-            !$this->getHandleItem('enable_header')
-                ?: header("X-RecId: {$class->get('objectId')}");
+            \is_array($response = Sender::response(false)) ?: $response = [];
+            $this->handle['enable_header'] = Decoder::getHandle('enable_header');
+            !Decoder::getHandle('enable_header') ?: header("X-Object-Id: {$class->get('objectId')}");
         }
-    }
-
-    private function getHandleItem($name = null) {
-        return !\is_string($name)
-            ?: Decoder::getHandle()[$name];
     }
 
     private function inActivity($activity) {
         \in_array($activity, $this->activity, true)
-            ?: new HttpException(
-            self::getError('request_activity'), -500
-        );
+            ?: new HttpException(self::getError('request_activity'), -500);
     }
 
     private function fetch(LeanCloud $class, Query $init, $objectId) {
         $fetch = $class->get($init, $objectId);
-        parent::setClass('request', $fetch->get('request'));
-        parent::setClass('response', $fetch->get('response'));
+        parent::setItem('request', $fetch->get('request'));
+        parent::setItem('response', $fetch->get('response'));
     }
 
     /**
      * @param $activity
      * @throws \ErrorException
      */
-    private function activity($activity) {
+    private function activity($activity = null) {
         switch ($activity) {
             case 'history':
                 $this->switchHandle('request');
                 $this->setTiming();
-                new Decoder(parent::getClass('response'));
+                new Decoder(parent::getItem('response'));
                 break;
             case 'current':
                 $this->switchHandle('request');
                 $this->setTiming();
-                new Sender(parent::getClass('request'));
+                new Sender(parent::getItem('request'));
                 $this->lockClass();
                 new Decoder(Sender::response(false));
                 break;

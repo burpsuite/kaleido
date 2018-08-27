@@ -11,11 +11,10 @@ class Worker
     public $taskId;
 
     /**
-     * @return mixed
      * @throws \ErrorException
      */
     protected function load() {
-        return $this->route = json_decode(new Loader, true);
+        $this->route = json_decode(new Loader, true);
     }
 
     /**
@@ -30,11 +29,11 @@ class Worker
         }
     }
 
-    protected static function getClass($name = 'null') {
+    protected static function getItem($name = 'null') {
         return self::$class[$name] ?? null;
     }
 
-    protected static function setClass($name, $value) {
+    protected static function setItem($name, $value) {
         \is_string($name) ?: $name = 'null';
         switch ($name) {
             case \is_array($value) && !\count($value):
@@ -51,7 +50,7 @@ class Worker
 
     protected function setReplace($replace, $subject, $saveName) {
         \is_array($replace) && \count($replace) 
-            ?: self::setClass($saveName, $subject);
+            ?: self::setItem($saveName, $subject);
         foreach ($replace as $key => $value) {
             switch ($replace) {
                 case \is_array($subject):
@@ -61,7 +60,7 @@ class Worker
                     }
                     break;
                 case \is_string($subject):
-                    self::setClass($saveName, $subject = 
+                    self::setItem($saveName, $subject = 
                     preg_replace("/{$key}/", $value, $subject));
                     break;
             }
