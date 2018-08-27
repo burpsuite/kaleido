@@ -30,8 +30,8 @@ class Decoder extends Worker
         parent::switchHandle('response');
         $this->setHandle()->checkError();
         $this->setHeaders()->setCookies();
-        $this->setTiming()->setUniqueId()
-        ->setCurrentDate()->setBody();
+        $this->setTiming()->setRequestId()
+        ->setResponseDate()->setBody();
     }
 
     private function checkError() {
@@ -66,15 +66,15 @@ class Decoder extends Worker
             ? self::$lock['body'] : 'error_body';
     }
 
-    private function setCurrentDate() {
+    private function setResponseDate() {
         !self::getHandle('enable_header')
             ?: header('X-Response-Date:'. gmdate('c'));
         return $this;
     }
 
-    private function setUniqueId() {
+    private function setRequestId() {
         !self::getHandle('enable_header') ?: header(
-            'X-Unique-Id:'. str_replace('.', '', uniqid('', true)));
+            'X-Request-Id:'. str_replace('.', '', uniqid('', true)));
         return $this;
     }
 
