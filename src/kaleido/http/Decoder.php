@@ -47,7 +47,7 @@ class Decoder extends Worker
         self::resetClass();
     }
 
-    public static function getHandle($item = null) :array {
+    public static function getHandle($item = null) {
         return self::$handleItem[$item] ?? null;
     }
 
