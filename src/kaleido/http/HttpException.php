@@ -15,13 +15,10 @@ class HttpException extends \RuntimeException
             throw new \RuntimeException(null);
         } catch (\RuntimeException $exception) {
             getenv(strtoupper('debug'))
-             ? error_log("[debug] [exception] info:[{$message}] code:[{$code}]".PHP_EOL) : null;
-            exit(json_encode([
-                'message' => $message,
-                'code' => $code,
-                'stack' => getenv(strtoupper('debug'))
-                    ? (array)$exception : null
-            ]));
+             ? error_log("[debug] [exception] info:[{$message}] code:[{$code}]") : null;
+            exit(json_encode(['message' => $message, 'code' => $code,
+                'stack' => getenv(strtoupper('debug')) ? (array)$exception : false
+            ], JSON_PRETTY_PRINT) . PHP_EOL);
         }
     }
 }
