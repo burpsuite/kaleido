@@ -109,8 +109,7 @@ class Decoder extends Worker
             $this->setReplace(self::getHandle('header'), $this->headers, 'headers');
             \is_array(parent::getItem('headers')) ? $data = parent::getItem('headers') : $data = [];
             foreach ($data as $key => $value) {
-                $key === 'Status-Line' ? header((string) $value)
-                    : header("{$key}: {$value}");
+                $key === 'Status-Line' ? header((string) $value) : header("{$key}: {$value}");
             }
         }
         return $this;

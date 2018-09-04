@@ -77,9 +77,8 @@ class Capture extends Worker
     }
 
     private function fetch(LeanCloud $class, Query $init, $objectId) {
-        $fetch = $class->get($init, $objectId);
-        parent::setItem('request', $fetch->get('request'));
-        parent::setItem('response', $fetch->get('response'));
+        parent::setItem('request', $class->get($init, $objectId)->get('request'));
+        parent::setItem('response', $class->get($init, $objectId)->get('response'));
     }
 
     /**
