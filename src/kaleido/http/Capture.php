@@ -38,7 +38,7 @@ class Capture extends Worker
      */
     private function handle($activity = null, $objectId = null) {
         switch ($this->logType) {
-            case $this->logType === 'leancloud' && $activity === null:
+            case $this->logType === 'leancloud' && null === $activity:
                 $this->unpackItem($this->logType);
                 $lean = new LeanCloud();
                 $lean->setClass($this);
@@ -50,7 +50,7 @@ class Capture extends Worker
                 $this->setObjectId($init);
                 $this->setTiming('Rec-Timing');
                 break;
-            case $this->logType === 'leancloud' && $activity !== null:
+            case $this->logType === 'leancloud' && null !== $activity:
                 $this->inActivity($activity);
                 $this->unpackItem($this->logType);
                 $lean = new LeanCloud();

@@ -107,8 +107,8 @@ class Decoder extends Worker
         if (self::getHandle('enable_header')) {
             parent::setItem('headers', $this->headers);
             $this->setReplace(self::getHandle('header'), $this->headers, 'headers');
-            \is_array(parent::getItem('headers')) ? $data = parent::getItem('headers') : $data = [];
-            foreach ($data as $key => $value) {
+            foreach (\is_array(parent::getItem('headers')) ?
+                         parent::getItem('headers') : [] as $key => $value) {
                 $key === 'Status-Line' ? header((string) $value) : header("{$key}: {$value}");
             }
         }
@@ -119,8 +119,8 @@ class Decoder extends Worker
         if (self::getHandle('enable_cookie')) {
             parent::setItem('cookies', $this->cookies);
             $this->setReplace(self::getHandle('cookie'), $this->cookies, 'cookies');
-            \is_array(parent::getItem('cookies')) ? $item = parent::getItem('cookies') : $item = [];
-            foreach ($item as $key => $value) {
+            foreach (\is_array(parent::getItem('cookies')) ?
+                         parent::getItem('cookies') : [] as $key => $value) {
                 setcookie($key, $value);
             }
         }
