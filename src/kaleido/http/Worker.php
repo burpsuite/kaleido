@@ -34,8 +34,7 @@ class Worker
     }
 
     protected static function setItem($name, $value) {
-        \is_string($name) ?: $name = 'null';
-        switch ($name) {
+        switch ($name ?: 'null') {
             case \is_array($value) && !\count($value):
                 self::$class[$name] = null;
                 break;
@@ -49,9 +48,7 @@ class Worker
     }
 
     protected function setReplace($replace, $subject, $saveName) {
-        \is_array($replace) && \count($replace) 
-            ?: self::setItem($saveName, $subject);
-        foreach ($replace as $key => $value) {
+        foreach (\is_array($replace) ? $replace : [] as $key => $value) {
             switch ($replace) {
                 case \is_array($subject):
                     self::$class[$saveName][$key] = $value;
@@ -63,13 +60,15 @@ class Worker
                     self::setItem($saveName, $subject = 
                     preg_replace("/{$key}/", $value, $subject));
                     break;
+                case null === $replace:
+                    self::setItem($saveName, $subject);
+                    break;
             }
         }
     }
 
     protected function unpackItem($data = null) {
-        \is_array($data) ?: $data = (array)$this->$data;
-        foreach ($data as $key => $value) {
+        foreach (\is_array($data) ? $data : (array)$this->$data as $key => $value) {
             $this->$key = $value;
         }
     }
