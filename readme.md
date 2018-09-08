@@ -22,6 +22,21 @@ Kaleido network traffic forwarding tool(api-gateway).
 composer install burpsuite/kaleido
 ```
 
+## Usage
+```php
+$dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
+    $r->addRoute(
+        ['GET', 'POST', 'PUT', 'HEAD', 'OPTIONS', 'PATCH', 'SEARCH', 'DELETE'],
+        '/kaleido/{taskId:[0-9a-f\-]+}/{url:[\w\:\/\-\.\_\%]+\??}{param:.*}',
+        ['Kaleido\Http\Loader', 'listenHttp']
+    );
+    $r->addRoute(
+        'GET', '/kaleido/{activity:\w+}/{objectId:\w+}',
+        ['Kaleido\Http\Loader', 'replayHttp']
+    );
+});
+```
+
 ## Loader
 ```json
 {
@@ -93,21 +108,6 @@ composer install burpsuite/kaleido
     }
   }
 ]
-```
-
-## FastRoute
-```php
-$dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-    $r->addRoute(
-        ['GET', 'POST', 'PUT', 'HEAD', 'OPTIONS', 'PATCH', 'SEARCH', 'DELETE'],
-        '/kaleido/{taskId:[0-9a-f\-]+}/{url:[\w\:\/\-\.\_\%]+\??}{param:.*}',
-        ['Kaleido\Http\Loader', 'listenHttp']
-    );
-    $r->addRoute(
-        'GET', '/kaleido/{activity:\w+}/{objectId:\w+}',
-        ['Kaleido\Http\Loader', 'replayHttp']
-    );
-});
 ```
 
 ## Maybe Later
