@@ -22,9 +22,9 @@ Kaleido network traffic forwarding tool(api-gateway).
 composer install burpsuite/kaleido
 ```
 
-# Kaleido(Http)
+## Kaleido(Http)
 
-## Usage
+### Usage
 ```php
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute(
@@ -39,7 +39,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 });
 ```
 
-## Loader
+### Loader
 ```json
 {
   "loadType": "remote",
@@ -54,7 +54,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 }
 ```
 
-## Capture
+### Capture
 ```json
 {
   "logType": "leancloud",
@@ -68,7 +68,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 }
 ```
 
-## Sample
+### Sample
 ```json
 [
   {
@@ -112,7 +112,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 ]
 ```
 
-# Kaleido(Socket)
+## Kaleido(Socket)
 ```
 ```
 
