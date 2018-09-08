@@ -22,7 +22,7 @@ Kaleido network traffic forwarding tool(api-gateway).
 composer install burpsuite/kaleido
 ```
 
-## Kaleido(Http) based on [php-curl-class](https://github.com/php-curl-class/php-curl-class)
+## Kaleido(Http)
 
 ### Usage
 ```php
