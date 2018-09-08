@@ -112,6 +112,10 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 ]
 ```
 
+# Kaleido(Socket)
+```
+```
+
 ## Maybe Later
   * Support Socket (react/socket).
   * Support Stream (react/stream).
