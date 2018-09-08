@@ -86,20 +86,16 @@ class Capture extends Worker
      * @throws \ErrorException
      */
     private function activity($activity = null) {
-        switch ($activity) {
-            case 'history':
-                $this->switchHandle('request');
-                $this->setTiming();
-                new Decoder(parent::getItem('response'));
-                break;
-            case 'current':
-                $this->switchHandle('request');
-                $this->setTiming();
-                new Sender(parent::getItem('request'));
-                $this->lockClass();
-                new Decoder(Sender::response(false));
-                break;
-            default:
+        if ($activity === 'history') {
+            $this->switchHandle('request');
+            $this->setTiming();
+            new Decoder(parent::getItem('response'));
+        } elseif ($activity === 'current') {
+            $this->switchHandle('request');
+            $this->setTiming();
+            new Sender(parent::getItem('request'));
+            $this->lockClass();
+            new Decoder(Sender::response(false));
         }
     }
 

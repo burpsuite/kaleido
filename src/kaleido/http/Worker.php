@@ -93,8 +93,8 @@ class Worker
         return $this;
     }
 
-    protected static function errorItem() :array {
-        return [
+    protected static function errorItem(callable $call) {
+        $call([
             'abnormal'=> 'target server status is abnormal.',
             'request_host'=> 'request_host and kaleido do not match.',
             'request_method'=> 'request_method and kaleido do not match',
@@ -110,11 +110,13 @@ class Worker
             'env_undefined'=> 'kaleido env_configuration is undefined.',
             'non_json'=> 'kaleido configuration is a non-json type.',
             'save_exception'=> 'kaleido record save exception.'
-        ];
+        ]);
     }
 
-    protected static function getError($id = null) {
-        return self::errorItem()[$id] ?? null;
+    protected static function getError($id = null) :string {
+        self::errorItem(function ($item) use($id) {
+            return $item[$id] ?? null;
+        });
     }
 
     protected static function resetClass() :array {
