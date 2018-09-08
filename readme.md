@@ -94,7 +94,8 @@ composer install burpsuite/kaleido
   }
 ]
 ```
-## fastRoute
+
+## FastRoute
 ```php
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute(
