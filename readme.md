@@ -22,6 +22,8 @@ Kaleido network traffic forwarding tool(api-gateway).
 composer install burpsuite/kaleido
 ```
 
+# Kaleido(Http)
+
 ## Usage
 ```php
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
