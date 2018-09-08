@@ -83,8 +83,8 @@ class Worker
 
     protected function setTiming($name = 'Timing') {
         null !== ($time = self::$timing[$name]) ?: self::$timing[$name] = Utility::millitime();
-        !$time && !$this->handle['enable_header'] && !\is_int(self::$timing[$name])
-            ?: header("X-{$name}: ". (Utility::millitime() - self::$timing[$name]).'ms');
+        $time && $this->handle['enable_header'] && \is_int(self::$timing[$name])
+            ? header("X-{$name}: ". (Utility::millitime() - self::$timing[$name]).'ms') : null;
         return $this;
     }
 
