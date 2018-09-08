@@ -22,7 +22,7 @@ Kaleido network traffic forwarding tool(api-gateway).
 composer install burpsuite/kaleido
 ```
 
-## Usage
+## Loader
 ```json
 {
   "loadType": "remote",
