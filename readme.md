@@ -94,6 +94,20 @@ composer install burpsuite/kaleido
   }
 ]
 ```
+## fastRoute
+```php
+$dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
+    $r->addRoute(
+        ['GET', 'POST', 'PUT', 'HEAD', 'OPTIONS', 'PATCH', 'SEARCH', 'DELETE'],
+        '/kaleido/{taskId:[0-9a-f\-]+}/{url:[\w\:\/\-\.\_\%]+\??}{param:.*}',
+        ['Kaleido\Http\Loader', 'listenHttp']
+    );
+    $r->addRoute(
+        'GET', '/kaleido/{activity:\w+}/{objectId:\w+}',
+        ['Kaleido\Http\Loader', 'replayHttp']
+    );
+});
+```
 
 ## Maybe Later
   * Support Socket (react/socket).
