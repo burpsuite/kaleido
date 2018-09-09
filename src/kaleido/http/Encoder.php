@@ -36,7 +36,7 @@ class Encoder extends Worker
     }
 
     private function lockClass() {
-        self::$lock = self::$class;
+        self::$lock = self::$item;
         self::resetClass();
     }
 
@@ -140,7 +140,7 @@ class Encoder extends Worker
         !strpos(parent::getItem('url'), "\?")
             ?: parent::setItem('url', parent::getItem('url').'?');
         parent::setItem('url', parent::getItem('url').rtrim($url_params, '&'));
-        unset(self::$class['url_params']);
+        unset(self::$item['url_params']);
     }
 
     private function setHeader() {

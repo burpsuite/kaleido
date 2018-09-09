@@ -100,7 +100,7 @@ class Capture extends Worker
     }
 
     private function lockClass() {
-        self::$lock = self::$class;
+        self::$lock = self::$item;
         parent::resetClass();
     }
 }

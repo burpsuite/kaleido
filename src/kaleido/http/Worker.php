@@ -4,46 +4,48 @@ namespace Kaleido\Http;
 
 class Worker
 {
+    public static $loader;
     public static $timing = [];
-    public static $class = [];
+    public static $item = [];
     public $handle = [];
-    public $route = [];
+    public $taskRoute = [];
     public $taskId;
 
     /**
      * @throws \ErrorException
      */
     protected function load() {
-        $this->route = json_decode(new Loader, true);
+        self::$loader ? $this->taskRoute = self::$loader
+         : $this->taskRoute = json_decode(new Loader, true);
     }
 
     /**
      * @param bool $taskId
      */
     protected function matchTaskId($taskId = false) {
-        if (!array_key_exists($taskId ?: $taskId = $this->taskId, $this->route)) {
+        if (!array_key_exists($taskId ?: $taskId = $this->taskId, $this->taskRoute)) {
             new HttpException(self::getError('0x01'), 500);
         }
-        foreach ($this->route[$taskId] as $key => $value) {
+        foreach ($this->taskRoute[$taskId] as $key => $value) {
             !\array_key_exists($key, get_class_vars(\get_class($this)))
                 ?: $this->$key = $value;
         }
     }
 
     protected static function getItem($name = 'null') {
-        return self::$class[$name] ?? null;
+        return self::$item[$name] ?? null;
     }
 
     protected static function setItem($name, $value) {
         switch ($name ?: 'null') {
             case \is_array($value) && !\count($value):
-                self::$class[$name] = null;
+                self::$item[$name] = null;
                 break;
             case null === $value:
-                unset(self::$class[$name]);
+                unset(self::$item[$name]);
                 break;
             default:
-                self::$class[$name] = $value;
+                self::$item[$name] = $value;
                 break;
         }
     }
@@ -52,9 +54,9 @@ class Worker
         foreach (\is_array($replace) ? $replace : [] as $key => $value) {
             switch ($replace) {
                 case \is_array($subject):
-                    self::$class[$saveName][$key] = $value;
+                    self::$item[$saveName][$key] = $value;
                     if (!$value) {
-                        unset(self::$class[$saveName][$key]);
+                        unset(self::$item[$saveName][$key]);
                     }
                     break;
                 case \is_string($subject):
@@ -122,6 +124,6 @@ class Worker
     }
 
     protected static function resetClass() :array {
-        return self::$class = [];
+        return self::$item = [];
     }
 }

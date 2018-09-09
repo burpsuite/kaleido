@@ -169,7 +169,7 @@ class Loader extends Worker
     }
 
     private function lockClass() {
-        self::$lock = self::$class;
+        self::$lock = self::$item;
         self::resetClass();
     }
 

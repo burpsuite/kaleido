@@ -53,7 +53,7 @@ class Sender extends Worker
     }
 
     private function lockClass() {
-        self::$lock = self::$class;
+        self::$lock = self::$item;
         self::resetClass();
     }
 
@@ -136,7 +136,7 @@ class Sender extends Worker
     private function setHeaders(CaseInsensitiveArray $headers) {
         foreach ($headers as $key => $value) {
             if ($key !== 'Set-Cookie') {
-                self::$class['headers'][$key] = $value;
+                self::$item['headers'][$key] = $value;
             }
         }
     }
