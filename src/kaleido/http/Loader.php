@@ -51,22 +51,19 @@ class Loader extends Worker
      * @throws \ErrorException
      */
     private function complete() {
-        switch ($this->loadCache) {
-            case !\count($this->loadCache):
-                $this->loadDatabase();
-                break;
-            case \count($this->loadCache) > 1:
-                $redis = $this->predis();
-                $this->checkLoadData();
-                $this->generateHash();
-                $this->unpackExpire($redis);
-                $this->isExist($redis);
-                $this->isExpired();
-                $this->checkValidCache();
-                $this->saveRedis($redis);
-                $redis->disconnect();
-                $this->setConsole();
-                break;
+        if (\count($this->loadCache) > 1) {
+            $redis = $this->predis();
+            $this->checkLoadData();
+            $this->generateHash();
+            $this->unpackExpire($redis);
+            $this->isExist($redis);
+            $this->isExpired();
+            $this->checkValidCache();
+            $this->saveRedis($redis);
+            $redis->disconnect();
+            $this->setConsole();
+        } elseif (!\count($this->loadCache)) {
+            $this->loadDatabase();
         }
     }
 
