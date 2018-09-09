@@ -35,7 +35,7 @@ class Loader extends Worker
     /**
      * @throws \ErrorException
      */
-    public function handle() {
+    private function handle() {
         switch ($this->loadType) {
             case 'local':
                 $this->loadDatabase();
