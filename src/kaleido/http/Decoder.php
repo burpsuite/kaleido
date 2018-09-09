@@ -62,8 +62,9 @@ class Decoder extends Worker
     }
 
     public static function getBody() {
-        return \is_string(self::$lock['body'])
-            ? self::$lock['body'] : 'error_body';
+        \is_string(self::$lock['body']) ?: new HttpException(
+            parent::getError('0x02'), 500);
+        return self::$lock['body'];
     }
 
     private function setResponseDate() {

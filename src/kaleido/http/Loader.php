@@ -72,8 +72,8 @@ class Loader extends Worker
 
     private function unLoadCache() {
         !\in_array($this->cacheType(), $this->allow, true)
-            ?: $this->setLoadCache('data',
-        getenv($this->getLoadCache('data')));
+            ?: $this->setLoadCache('data', 
+                getenv($this->getLoadCache('data')));
     }
 
     private function cacheType() {
@@ -206,15 +206,12 @@ class Loader extends Worker
     }
 
     private function getResponse($response) {
-        switch ($response) {
-            case \is_object($response):
-                parent::setItem('fetch', json_encode($response));
-                $this->isJson(parent::getItem('fetch'));
-                break;
-            case \is_string($response):
-                parent::setItem('fetch', $response);
-                $this->isJson(parent::getItem('fetch'));
-                break;
+        if (\is_object($response)) {
+            parent::setItem('fetch', json_encode($response));
+            $this->isJson(parent::getItem('fetch'));
+        } elseif (\is_string($response)) {
+            parent::setItem('fetch', $response);
+            $this->isJson(parent::getItem('fetch'));
         }
     }
 

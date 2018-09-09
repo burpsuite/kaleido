@@ -86,25 +86,21 @@ class Encoder extends Worker
 
     private function setUrlParam() {
         switch ($this->method) {
-            case $this->method === 'get' && $this->handle['fix_urlencode']:
-                parent::setItem('url', parent::getItem('url') .
-                    $_SERVER['QUERY_STRING']);
+            case 'get' === $this->method && $this->handle['fix_urlencode']:
+                parent::setItem('url', parent::getItem('url') . $_SERVER['QUERY_STRING']);
                 break;
-            case $this->method === 'get':
+            case 'get' === $this->method:
                 parent::setItem('params', $_GET);
-                $this->setReplace($this->handle['url_param'],
-                    $_GET, 'params');
+                $this->setReplace($this->handle['url_param'], $_GET, 'params');
                 break;
             case \in_array($this->method, $this->allow, true) && \count($_POST) > 1:
                 $this->combineUrlParam();
                 parent::setItem('params', $_POST);
-                $this->setReplace($this->handle['form_param'],
-                    $_POST, 'params');
+                $this->setReplace($this->handle['form_param'], $_POST, 'params');
                 break;
             case \in_array($this->method, $this->allow, true) && !\count($_POST):
                 $this->combineUrlParam();
-                $this->setReplace($this->handle['body'],
-                    file_get_contents('php://input'), 'params');
+                $this->setReplace($this->handle['body'], file_get_contents('php://input'), 'params');
                 $this->patchBody();
                 break;
         }
