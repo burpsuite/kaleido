@@ -52,6 +52,8 @@ class Worker
     }
 
     protected function setReplace($replace, $subject, $saveName) {
+        \is_array($replace) && empty($replace)
+            ? self::setItem($saveName, $subject) : false;
         foreach (\is_array($replace) ? $replace : [] as $key => $value) {
             switch ($replace) {
                 case \is_array($subject):
@@ -63,9 +65,6 @@ class Worker
                 case \is_string($subject):
                     self::setItem($saveName, $subject = 
                     preg_replace("/{$key}/", $value, $subject));
-                    break;
-                case null === $replace:
-                    self::setItem($saveName, $subject);
                     break;
             }
         }
