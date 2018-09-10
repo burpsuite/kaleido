@@ -7,7 +7,6 @@ use Predis\Client;
 
 class Loader extends Worker
 {
-    public static $lock = [];
     public $allow = ['dynamic'];
     public $expire = [];
     public $hashName;
@@ -25,7 +24,7 @@ class Loader extends Worker
         $this->getEnv('database');
         $this->unpackItem('loadInfo');
         $this->handle();
-        $this->lockClass();
+        parent::lockItem(__CLASS__);
     }
 
     public function __toString() {
@@ -95,8 +94,8 @@ class Loader extends Worker
     }
 
     public static function fetch() {
-        return \is_string(self::$lock['fetch'])
-            ? self::$lock['fetch'] : 'error_fetch';
+        return \is_string(self::$lock[__CLASS__]['fetch'])
+            ? self::$lock[__CLASS__]['fetch'] : 'error_fetch';
     }
 
     private function local($setName, $fileName) {
@@ -134,7 +133,7 @@ class Loader extends Worker
      */
     public function listenHttp($taskId, $url) :string {
         new Encoder($taskId, $url);
-        new Sender(Encoder::class(false));
+        new Sender(Encoder::payload(false));
         new Decoder(Sender::response(false));
         new Capture();
         return Decoder::getBody();
@@ -163,11 +162,6 @@ class Loader extends Worker
     private function setConsole() {
         parent::getItem('expired') ? error_log('redisExpire: 0')
          : error_log('redisExpire: '. (parent::getItem('expire') - time()));
-    }
-
-    private function lockClass() {
-        self::$lock = self::$item;
-        self::resetClass();
     }
 
     private function isJson($data = null) {

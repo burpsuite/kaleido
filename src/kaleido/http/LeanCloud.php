@@ -41,7 +41,7 @@ class LeanCloud
     }
 
     public function setRequest(LeanObject $class) :LeanObject {
-        return $class->set('request', Encoder::class(false));
+        return $class->set('request', Encoder::payload(false));
     }
 
     public function setResponse(LeanObject $class) :LeanObject {

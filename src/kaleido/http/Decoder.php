@@ -5,7 +5,6 @@ namespace Kaleido\Http;
 class Decoder extends Worker
 {
     private static $handleItem = [];
-    private static $lock;
     public $error = false;
     public $errorCode = 0;
     public $respType;
@@ -23,7 +22,7 @@ class Decoder extends Worker
         parent::unpackItem($response);
         parent::matchTaskId();
         $this->handle();
-        $this->lockClass();
+        parent::lockItem(__CLASS__);
     }
 
     private function handle() {
@@ -42,11 +41,6 @@ class Decoder extends Worker
         }
     }
 
-    private function lockClass() {
-        self::$lock = self::$item;
-        self::resetClass();
-    }
-
     public static function getHandle($item = null) {
         return self::$handleItem[$item] ?? null;
     }
@@ -57,14 +51,14 @@ class Decoder extends Worker
     }
 
     public static function class($encode) {
-        return $encode ? json_encode(self::$lock)
-            : (array)self::$lock;
+        return $encode ? json_encode(parent::$lock[__CLASS__])
+            : (array)parent::$lock[__CLASS__];
     }
 
     public static function getBody() {
-        \is_string(self::$lock['body']) ?: new HttpException(
-            parent::getError('0x02'), 500);
-        return self::$lock['body'];
+        \is_string(parent::$lock[__CLASS__]['body'])
+            ?: new HttpException(parent::getError('0x02'), 500);
+        return parent::$lock[__CLASS__]['body'];
     }
 
     private function setResponseDate() {

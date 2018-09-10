@@ -4,6 +4,7 @@ namespace Kaleido\Http;
 
 class Worker
 {
+    protected static $lock = [];
     public static $loader;
     public static $timing = [];
     public static $item = [];
@@ -124,7 +125,8 @@ class Worker
         });
     }
 
-    protected static function resetClass() :array {
+    protected function lockItem($className = null) :array {
+        self::$lock[$className] = self::$item;
         return self::$item = [];
     }
 }

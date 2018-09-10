@@ -8,7 +8,6 @@ use LeanCloud\Query;
 
 class Capture extends Worker
 {
-    public static $lock = [];
     public $activity = ['history', 'current'];
     public $leancloud = [];
     public $apiServer;
@@ -94,13 +93,8 @@ class Capture extends Worker
             $this->switchHandle('request');
             $this->setTiming();
             new Sender(parent::getItem('request'));
-            $this->lockClass();
+            parent::lockItem();
             new Decoder(Sender::response(false));
         }
-    }
-
-    private function lockClass() {
-        self::$lock = self::$item;
-        parent::resetClass();
     }
 }

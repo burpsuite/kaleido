@@ -7,7 +7,6 @@ use Curl\CaseInsensitiveArray;
 
 class Sender extends Worker
 {
-    private static $lock;
     public $protocol = ['get', 'post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
     public $maxSize;
     public $url;
@@ -25,7 +24,7 @@ class Sender extends Worker
         parent::unpackItem($payload);
         $this->check();
         $this->handle();
-        $this->lockClass();
+        parent::lockItem(__CLASS__);
     }
 
     public function check() {
@@ -52,14 +51,9 @@ class Sender extends Worker
         : $this->setBody($curl->response, $curl->responseHeaders);
     }
 
-    private function lockClass() {
-        self::$lock = self::$item;
-        self::resetClass();
-    }
-
     public static function response($encode) {
-        return $encode ? json_encode(self::$lock)
-            : (array)self::$lock;
+        return $encode ? json_encode(self::$lock[__CLASS__])
+            : (array)self::$lock[__CLASS__];
     }
 
     private function setTaskId() {

@@ -7,7 +7,6 @@ class Encoder extends Worker
     public $allow = ['post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
     public $method;
     public $host;
-    private static $lock = [];
 
     /**
      * Encoder constructor.
@@ -21,7 +20,7 @@ class Encoder extends Worker
         parent::matchTaskId($taskId);
         $this->check($url);
         $this->handle($taskId, $url);
-        $this->lockClass();
+        parent::lockItem(__CLASS__);
     }
 
     private function check($url) {
@@ -35,14 +34,9 @@ class Encoder extends Worker
         ->setCookie()->setHeader()->setMaxSize();
     }
 
-    private function lockClass() {
-        self::$lock = self::$item;
-        self::resetClass();
-    }
-
-    public static function class($encode) {
-        return $encode ? json_encode(self::$lock)
-            : self::$lock;
+    public static function payload($encode) {
+        return $encode ? json_encode(parent::$lock[__CLASS__])
+            : (array)parent::$lock[__CLASS__];
     }
 
     private function getHost($url = null) :string {
