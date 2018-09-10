@@ -47,7 +47,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     "loadData": "http://localhost/kaleido_v3.json",
     "loadCache": {
       "type": "dynamic",
-      "data": "REDIS_URL",
+      "data": "redis_url",
       "interval": 86400
     }
   }
