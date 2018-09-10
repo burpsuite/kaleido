@@ -100,9 +100,10 @@ class Worker
     protected static function errorItem(callable $call) {
         return $call([
             '0x01' => 'unable to find taskId configuration.',
-            '0x02' => 'response body is non string type.',
+            '0x02' => 'response body is non-string type.',
             '0x03' => 'request method is an unsupported type.',
             '0x04' => 'request host is a invalid protocol.',
+            '0x05' => 'loader configuration is non-string type.',
             'abnormal'=> 'target server status is abnormal.',
             'request_host'=> 'request_host and kaleido do not match.',
             'request_method'=> 'request_method and kaleido do not match',

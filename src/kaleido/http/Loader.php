@@ -67,9 +67,10 @@ class Loader extends Worker
     }
 
     private function unLoadCache() {
-        !\in_array($this->cacheType(), $this->allow, true)
-            ?: $this->setLoadCache('data', 
-                getenv($this->getLoadCache('data')));
+        if ('dynamic' !== $this->cacheType()) {
+            $this->setLoadCache('data', strtoupper(
+                getenv($this->getLoadCache('data'))));
+        }
     }
 
     private function cacheType() {
@@ -94,8 +95,9 @@ class Loader extends Worker
     }
 
     public static function fetch() {
-        return \is_string(self::$lock[__CLASS__]['fetch'])
-            ? self::$lock[__CLASS__]['fetch'] : 'error_fetch';
+        \is_string(parent::$lock[__CLASS__]['fetch'])
+            ?: new HttpException(parent::getError('0x05'), 500);
+        return parent::$lock[__CLASS__]['fetch'];
     }
 
     private function local($setName, $fileName) {
