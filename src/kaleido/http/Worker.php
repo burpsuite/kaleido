@@ -38,8 +38,8 @@ class Worker
     }
 
     protected static function setItem($name, $value) {
-        switch ($name ?: 'null') {
-            case \is_array($value) && !\count($value):
+        switch ($name ?: []) {
+            case \is_array($value) && empty($value):
                 self::$item[$name] = null;
                 break;
             case null === $value:
@@ -47,6 +47,17 @@ class Worker
                 break;
             default:
                 self::$item[$name] = $value;
+                break;
+        }
+    }
+
+    protected function getUrlInfo($url = 'null', $urlType) :string {
+        switch ($urlType) {
+            case 'host':
+                return explode('/', $url)[2];
+                break;
+            case 'protocol':
+                return explode(':', $url)[0];
                 break;
         }
     }

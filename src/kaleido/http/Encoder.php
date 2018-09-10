@@ -23,15 +23,16 @@ class Encoder extends Worker
         parent::lockItem(__CLASS__);
     }
 
-    private function check($url) {
+    private function check($url = null) {
         $this->switchHandle('request');
         $this->checkHost($url)->checkMethod();
     }
 
-    private function handle($taskId, $url) {
+    private function handle($taskId, $url = null) {
         $this->setTaskId($taskId)->setMethod()
         ->setUrl($url)->setUrlParam()->setUrl($url)
-        ->setCookie()->setHeader()->setMaxSize();
+        ->setCookie()->setHeader()->setMaxSize()
+        ->setHost($url)->setProtocol($url);
     }
 
     public static function payload($encode) {
@@ -39,14 +40,20 @@ class Encoder extends Worker
             : (array)parent::$lock[__CLASS__];
     }
 
-    private function getHost($url = null) :string {
-        return preg_replace('/^(https?\:\/\/.*?\..*?)\/.*/', '$1', $url);
+    private function setHost($url = null) {
+        parent::setItem('host', parent::getUrlInfo($url, 'host'));
+        return $this;
+    }
+
+    private function setProtocol($url = null) {
+        parent::setItem('protocol', parent::getUrlInfo($url, 'protocol'));
+        return $this;
     }
 
     private function checkHost($url = null) {
         if ($this->handle['check_hostname']) {
             !\is_string($this->host) ?: $this->host = [$this->host];
-            if (!\in_array($this->getHost($url), $this->host, true)) {
+            if (!\in_array(parent::getUrlInfo($url, 'host'), $this->host, true)) {
                 new HttpException(self::getError('request_host'), -400);
             }
         }
