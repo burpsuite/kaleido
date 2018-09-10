@@ -13,7 +13,7 @@ class Capture extends Worker
     public $apiServer;
     public $appId;
     public $appKey;
-    public $logType;
+    public $capType;
     public $masterKey;
 
     /**
@@ -36,9 +36,9 @@ class Capture extends Worker
      * @throws \ErrorException
      */
     private function handle($activity = null, $objectId = null) {
-        switch ($this->logType) {
-            case $this->logType === 'leancloud' && null === $activity:
-                $this->unpackItem($this->logType);
+        switch ($this->capType) {
+            case $this->capType === 'leancloud' && null === $activity:
+                $this->unpackItem($this->capType);
                 $lean = new LeanCloud();
                 $lean->setClass($this);
                 $lean::initialize();
@@ -49,7 +49,7 @@ class Capture extends Worker
                 $this->setObjectId($init);
                 $this->setTiming('Save-Timing');
                 break;
-            case $this->logType === 'leancloud' && null !== $activity:
+            case $this->capType === 'leancloud' && null !== $activity:
                 $this->inActivity($activity);
                 $this->unpackItem($this->logType);
                 $lean = new LeanCloud();
