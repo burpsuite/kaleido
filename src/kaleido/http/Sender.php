@@ -57,7 +57,7 @@ class Sender extends Worker
     }
 
     private function setTaskId() {
-        if (!\is_string($this->taskId)) {
+        if (\is_string($this->taskId)) {
             parent::setItem('taskId', $this->taskId);
         }
         return $this;
