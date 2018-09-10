@@ -24,7 +24,7 @@ class Capture extends Worker
      * @throws \ErrorException
      */
     public function __construct($activity = null, $objectId = null) {
-        $this->setTiming('Rec-Timing');
+        $this->setTiming('Save-Timing');
         $this->getEnv('capture');
         $this->handle($activity, $objectId);
     }
@@ -47,7 +47,7 @@ class Capture extends Worker
                 $lean->setResponse($init);
                 $init->save();
                 $this->setObjectId($init);
-                $this->setTiming('Rec-Timing');
+                $this->setTiming('Save-Timing');
                 break;
             case $this->logType === 'leancloud' && null !== $activity:
                 $this->inActivity($activity);
