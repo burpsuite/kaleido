@@ -7,7 +7,6 @@ use Predis\Client;
 
 class Loader extends Worker
 {
-    public $allow = ['dynamic'];
     public $expire = [];
     public $hashName;
     public $hashExpire;
