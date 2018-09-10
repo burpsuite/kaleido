@@ -20,6 +20,10 @@ Kaleido network traffic forwarding tool(api-gateway).
 ## Install
 ```bash
 composer install burpsuite/kaleido
+
+"require": {
+  "burpsuite/kaleido": "^0.1.0002"
+}
 ```
 
 ## Kaleido(Http)
