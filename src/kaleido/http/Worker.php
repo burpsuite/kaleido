@@ -101,7 +101,7 @@ class Worker
         return $call([
             '0x01' => 'unable to find taskId configuration.',
             '0x02' => 'response body is non string type.',
-            '0x03' => 'request method is an unsupported protocol.',
+            '0x03' => 'request method is an unsupported type.',
             '0x04' => 'request host is a invalid protocol.',
             'abnormal'=> 'target server status is abnormal.',
             'request_host'=> 'request_host and kaleido do not match.',

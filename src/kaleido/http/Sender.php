@@ -7,13 +7,13 @@ use Curl\CaseInsensitiveArray;
 
 class Sender extends Worker
 {
-    public $protocol = ['get', 'post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
+    public $httpType = ['get', 'post', 'put', 'head', 'options', 'search', 'patch', 'delete'];
     public $maxSize;
     public $url;
     public $method;
-    public $params = [];
     public $headers = [];
     public $cookies = [];
+    public $params = [];
 
     /**
      * Sender constructor.
@@ -78,7 +78,7 @@ class Sender extends Worker
     }
 
     private function checkMethod() {
-        if (!\in_array($this->method, $this->protocol, true)) {
+        if (!\in_array($this->method, $this->httpType, true)) {
             new HttpException(self::getError('0x03'), -400);
         }
         return $this;
