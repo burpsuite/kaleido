@@ -66,7 +66,7 @@ class Loader extends Worker
     }
 
     private function unLoadCache() {
-        if ('dynamic' !== $this->cacheType()) {
+        if ('dynamic' === $this->cacheType()) {
             $this->setLoadCache('data', strtoupper(
                 getenv($this->getLoadCache('data'))));
         }
