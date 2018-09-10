@@ -63,7 +63,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 ### Capture
 ```json
 {
-  "logType": "leancloud",
+  "capType": "leancloud",
   "leancloud": {
     "appId": "pTPoK9Q7jGyTFpNXXXXXXXX-MdYXbMMI",
     "appKey": "uiTYApLfNDXXXXXXXXxEUTNx",
