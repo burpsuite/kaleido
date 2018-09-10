@@ -64,12 +64,17 @@ class Encoder extends Worker
     }
 
     private function setMaxSize() {
-        !\is_int($this->handle['maxSize']) ?: parent::setItem('maxSize', $this->handle['maxSize']);
+        if (\is_int($this->handle['maxSize'])) {
+            parent::setItem('maxSize', 
+                $this->handle['maxSize']);
+        }
         return $this;
     }
 
     private function setTaskId($taskId) {
-        !\is_string($taskId) ?: parent::setItem('taskId', $taskId);
+        if (\is_string($taskId)) {
+            parent::setItem('taskId', $taskId);
+        }
         return $this;
     }
 

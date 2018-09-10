@@ -57,7 +57,9 @@ class Sender extends Worker
     }
 
     private function setTaskId() {
-        !\is_string($this->taskId) ?: parent::setItem('taskId', $this->taskId);
+        if (!\is_string($this->taskId)) {
+            parent::setItem('taskId', $this->taskId);
+        }
         return $this;
     }
 
@@ -69,44 +71,44 @@ class Sender extends Worker
     }
 
     private function checkUrl() {
-        \is_string($this->url) ?: new HttpException(
-            self::getError('non_string'), -500);
         if (!preg_match('/https?\:\/\//', $this->url)) {
-            new HttpException(
-                self::getError('payload_host'), -400
-            );
+            new HttpException(self::getError('0x04'), -400);
         }
         return $this;
     }
 
     private function checkMethod() {
-        \is_string($this->method) ?: new HttpException(
-            self::getError('payload_method'), -500);
         if (!\in_array($this->method, $this->protocol, true)) {
-            new HttpException(
-                self::getError('unsupport_type'), -400
-            );
+            new HttpException(self::getError('0x03'), -400);
         }
         return $this;
     }
 
     private function checkParams() {
-        $this->params ?: $this->params = [];
+        if (!is_array($this->params)) {
+            $this->params = [];
+        }
         return $this;
     }
 
     private function checkCookies() {
-        \is_array($this->cookies) ?: $this->cookies = [];
+        if (!\is_array($this->cookies)) {
+            $this->cookies = [];
+        }
         return $this;
     }
 
     private function checkHeaders() {
-        \is_array($this->headers) ?: $this->headers = [];
+        if (!\is_array($this->headers)) {
+            $this->headers = [];
+        }
         return $this;
     }
 
     private function checkMaxSize() {
-        \is_int($this->maxSize) ?: $this->maxSize = 2097152;
+        if (!\is_int($this->maxSize)) {
+            $this->maxSize = 2097152;
+        }
         return $this;
     }
 
@@ -136,6 +138,8 @@ class Sender extends Worker
     }
 
     private function setCookies($cookies) {
-        !\is_array($cookies) ?: parent::setItem('cookies', $cookies);
+        if (\is_array($cookies)) {
+            parent::setItem('cookies', $cookies);
+        }
     }
 }

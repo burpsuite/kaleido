@@ -46,7 +46,9 @@ class Decoder extends Worker
     }
 
     private function setHandle() {
-        !\is_array($this->handle) ?: self::$handleItem = $this->handle;
+        if (\is_array($this->handle)) {
+            self::$handleItem = $this->handle;
+        }
         return $this;
     }
 

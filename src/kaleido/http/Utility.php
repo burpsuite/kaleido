@@ -5,7 +5,7 @@ namespace Kaleido\Http;
 class Utility
 {
     public static $lostHeader = ['Content-Type'];
-    public static $errHeader = ['Host'];
+    public static $errHeader = ['Host', 'Connection'];
     public static $headers = [];
 
 
