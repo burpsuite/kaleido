@@ -100,12 +100,12 @@ class Encoder extends Worker
                 $this->setReplace($this->handle['url_param'], $_GET, 'params');
                 break;
             case \in_array($this->method, $this->allow, true) && \count($_POST) > 1:
-                $this->combineUrlParam();
+                $this->combineUrlQuery();
                 parent::setItem('params', $_POST);
                 $this->setReplace($this->handle['form_param'], $_POST, 'params');
                 break;
             case \in_array($this->method, $this->allow, true) && !\count($_POST):
-                $this->combineUrlParam();
+                $this->combineUrlQuery();
                 $this->setReplace($this->handle['body'], file_get_contents('php://input'), 'params');
                 $this->patchBody();
                 break;
@@ -132,17 +132,15 @@ class Encoder extends Worker
         }
     }
 
-    private function combineUrlParam() {
-        $url_params = [];
+    private function combineUrlQuery() {
         parent::setItem('url_params', $_GET);
-        $this->setReplace($this->handle['url_param'], $_GET, 'url_params');
-        foreach (parent::getItem('url_params') as $key => $value) {
-            $params .= $key.'='.$value.'&';
-        }
-        !strpos(parent::getItem('url'), "\?")
+        $this->setReplace($this->handle['url_param'],
+            parent::getItem('url_params'), 'url_params');
+        $params = http_build_query(parent::getItem('url_params') ?? []);
+        !$params || strpos(parent::getItem('url'), '?', -1)
             ?: parent::setItem('url', parent::getItem('url').'?');
-        parent::setItem('url', parent::getItem('url').rtrim($params, '&'));
-        unset(self::$item['url_params']);
+        parent::setItem('url', parent::getItem('url').$params);
+        unset(parent::$item['url_params']);
     }
 
     private function setHeader() {
