@@ -137,11 +137,11 @@ class Encoder extends Worker
         parent::setItem('url_params', $_GET);
         $this->setReplace($this->handle['url_param'], $_GET, 'url_params');
         foreach (parent::getItem('url_params') as $key => $value) {
-            $url_params .= $key.'='.$value.'&';
+            $params .= $key.'='.$value.'&';
         }
         !strpos(parent::getItem('url'), "\?")
             ?: parent::setItem('url', parent::getItem('url').'?');
-        parent::setItem('url', parent::getItem('url').rtrim($url_params, '&'));
+        parent::setItem('url', parent::getItem('url').rtrim($params, '&'));
         unset(self::$item['url_params']);
     }
 

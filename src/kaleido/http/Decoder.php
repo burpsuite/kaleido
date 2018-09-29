@@ -64,14 +64,16 @@ class Decoder extends Worker
     }
 
     private function setResponseDate() {
-        !self::getHandle('enable_header')
-            ?: header('X-Response-Date:'. gmdate('c'));
+        if (self::getHandle('enable_header')) {
+            header('X-Response-Date:'. gmdate('c'));
+        }
         return $this;
     }
 
     private function setRequestId() {
-        !self::getHandle('enable_header') ?: header(
-            'X-Request-Id:'. str_replace('.', '', uniqid('', true)));
+        if (self::getHandle('enable_header')) {
+            header('X-Request-Id:'. str_replace('.', '', uniqid('', true)));
+        }
         return $this;
     }
 
