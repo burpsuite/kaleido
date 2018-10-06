@@ -28,7 +28,7 @@ composer install burpsuite/kaleido
 }
 ```
 
-## Kaleido(Http)
+## Http
 
 ### Usage
 ```php
@@ -118,7 +118,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 ]
 ```
 
-## Kaleido(Socket)
+## Socket
 ```
 ```
 
