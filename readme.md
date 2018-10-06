@@ -2,7 +2,7 @@
 Kaleido network traffic forwarding tool(api-gateway).
 <br>** I need more testing and improvement, don't use. **
 
-## Description
+## Features
   * Support GET, POST, PUT, DELETE, PATCH, SEARCH and More Request Methods.
   * Support Added/Delete/Modify Http Headers(Request/Response).
   * Support for Replay Request(Current)/Response(History).
